@@ -22,17 +22,24 @@ const QuizDetails = () => {
         {/* Grade */}
         <div className="flex flex-col">
           <label className="text-sm text-gray-600 mb-1">Grade Level</label>
+
           <select
-            value={details.grade || ""}
+            key={details.grade || ""}
+            value={
+              details.grade?.trim().replace(/^./, (c) => c.toUpperCase()) || ""
+            }
             onChange={(e) => updateDetails("grade", e.target.value)}
             className="border border-gray-300 rounded px-3 py-2"
           >
             <option value="">Select Grade</option>
-            {Array.from({ length: 10 }, (_, i) => (
-              <option key={i} value={`Grade ${i + 1}`}>
-                Grade {i + 1}
-              </option>
-            ))}
+            {Array.from({ length: 10 }, (_, i) => {
+              const grade = `Grade ${i + 1}`;
+              return (
+                <option key={grade} value={grade}>
+                  {grade}
+                </option>
+              );
+            })}
           </select>
         </div>
 
@@ -40,7 +47,10 @@ const QuizDetails = () => {
         <div className="flex flex-col">
           <label className="text-sm text-gray-600 mb-1">Subject</label>
           <select
-            value={details.subject || ""}
+            value={
+              details.subject?.trim().replace(/^./, (c) => c.toUpperCase()) ||
+              ""
+            }
             onChange={(e) => updateDetails("subject", e.target.value)}
             className="border border-gray-300 rounded px-3 py-2"
           >
@@ -60,7 +70,7 @@ const QuizDetails = () => {
         <div className="flex flex-col">
           <label className="text-sm text-gray-600 mb-1">Quarter</label>
           <select
-            value={details.quarter || ""}
+            value={details.quarter?.trim() || ""}
             onChange={(e) => updateDetails("quarter", e.target.value)}
             className="border border-gray-300 rounded px-3 py-2"
           >

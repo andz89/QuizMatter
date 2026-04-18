@@ -8,7 +8,14 @@ const createEmptyQuestion = (type = "multiple") => ({
   layout: "col",
   correct: "",
   isDirty: true,
-  dirtyFields: {},
+  isNew: true, // 👈 add this (important)
+
+  dirtyFields: {
+    question: true,
+    type: true,
+    layout: true,
+    correct: true,
+  },
 });
 const createOption = (questionId, label = "", value = "") => ({
   id: Date.now() + Math.random(),
@@ -16,12 +23,15 @@ const createOption = (questionId, label = "", value = "") => ({
   label,
   value,
   isDirty: true,
-  dirtyFields: {},
+  isNew: true, // 👈 add this
+
+  dirtyFields: {
+    label: true,
+    value: true,
+    questionId: true,
+  },
 });
-const useQuestionOptions = (questionId) =>
-  useQuizStore((state) =>
-    state.options.filter((opt) => opt.questionId === questionId),
-  );
+
 export const useQuizStore = create((set) => ({
   questions: [],
   options: [],
@@ -31,7 +41,7 @@ export const useQuizStore = create((set) => ({
   setDetails: (details) => set({ details }),
   addQuestion: () =>
     set((state) => {
-      const q = createEmptyQuestion();
+      const q = createEmptyQuestion("multiple");
 
       const newOptions = [
         createOption(q.id, "", "A"),
@@ -45,6 +55,18 @@ export const useQuizStore = create((set) => ({
         options: [...state.options, ...newOptions],
       };
     }),
+  updateDetails: (key, value) =>
+    set((state) => ({
+      details: {
+        ...state.details,
+        [key]: value,
+        isDirty: true,
+        dirtyFields: {
+          ...(state.details.dirtyFields || {}),
+          [key]: true,
+        },
+      },
+    })),
   updateQuestion: (id, updatedQuestion) =>
     set((state) => ({
       questions: state.questions.map((q) =>
@@ -169,15 +191,56 @@ export const useQuizStore = create((set) => ({
       };
     }),
 
-  clearDirty: (questionIds = [], optionIds = []) =>
+  clearDirty: ({ questions = [], options = [], details = [] }) =>
     set((state) => ({
-      questions: state.questions.map((q) =>
-        questionIds.includes(q.id)
-          ? { ...q, isDirty: false, dirtyFields: {} }
-          : q,
-      ),
-      options: state.options.map((opt) =>
-        optionIds.includes(opt.id) ? { ...opt, isDirty: false } : opt,
-      ),
+      questions: state.questions.map((q) => {
+        const match = questions.find((item) => item.id === q.id);
+        if (!match) return q;
+
+        const newDirtyFields = { ...q.dirtyFields };
+
+        match.fields.forEach((field) => {
+          delete newDirtyFields[field];
+        });
+
+        return {
+          ...q,
+          dirtyFields: newDirtyFields,
+          isDirty: Object.keys(newDirtyFields).length > 0,
+        };
+      }),
+
+      options: state.options.map((opt) => {
+        const match = options.find((item) => item.id === opt.id);
+        if (!match) return opt;
+
+        const newDirtyFields = { ...opt.dirtyFields };
+
+        match.fields.forEach((field) => {
+          delete newDirtyFields[field];
+        });
+
+        return {
+          ...opt,
+          dirtyFields: newDirtyFields,
+          isDirty: Object.keys(newDirtyFields).length > 0,
+        };
+      }),
+
+      details: state.details
+        ? (() => {
+            const newDirtyFields = { ...state.details.dirtyFields };
+
+            details.forEach((field) => {
+              delete newDirtyFields[field];
+            });
+
+            return {
+              ...state.details,
+              dirtyFields: newDirtyFields,
+              isDirty: Object.keys(newDirtyFields).length > 0,
+            };
+          })()
+        : state.details,
     })),
 }));
