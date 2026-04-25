@@ -4,12 +4,6 @@ const QuizTypeOptions = ({ questionId, setOpenMenu }) => {
   const { addQuestionAfter } = useQuizStore();
 
   const handleAdd = (type) => {
-    console.log(
-      "Adding question of type:",
-      type,
-      "-after question ID:",
-      questionId,
-    );
     addQuestionAfter(questionId, type);
     setOpenMenu(null);
   };

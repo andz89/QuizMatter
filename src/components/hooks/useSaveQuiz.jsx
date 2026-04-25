@@ -1,7 +1,27 @@
 "use client";
 import { useCallback, useRef, useState } from "react";
+
 import { useQuizStore } from "../../store/QuizStore";
 import { buildQuizPayload } from "../utils/buildQuizPayload";
+const saveQuiz = async (payload) => {
+  const res = await fetch("/api/saveQuiz", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    console.error("Save quiz error:", data.error);
+    throw new Error(data.error || "Failed to save");
+  }
+
+  return data;
+};
+
 export function useSaveQuiz() {
   const { questions, options, details, clearDirty, deletedQuestions } =
     useQuizStore();
@@ -56,7 +76,12 @@ export function useSaveQuiz() {
       });
 
       // simulate API
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await saveQuiz({
+        questions: questionPayload,
+        options: optionPayload,
+        details: detailsPayload,
+        deletedQuestions,
+      });
 
       clearDirty({
         questions: dirtyQuestions.map((q) => ({

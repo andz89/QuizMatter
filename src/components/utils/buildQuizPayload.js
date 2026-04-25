@@ -23,8 +23,8 @@ export function buildQuizPayload({
       return acc;
     }, {});
     return {
-      quizId: details.quizId,
-      id: q.id,
+      quiz_id: details.quizId,
+      question_id: q.question_id,
       ...updatedFields,
     };
   });
@@ -36,7 +36,8 @@ export function buildQuizPayload({
       return acc;
     }, {});
     return {
-      id: o.id,
+      option_id: o.option_id,
+      question_id: o.question_id,
       ...updatedFields,
     };
   });

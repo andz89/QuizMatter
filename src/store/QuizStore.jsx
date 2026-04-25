@@ -2,7 +2,7 @@
 import { create } from "zustand";
 
 const createEmptyQuestion = (type = "multiple") => ({
-  id: Date.now(),
+  question_id: Date.now(),
   question: "",
   type,
   layout: "col",
@@ -11,6 +11,7 @@ const createEmptyQuestion = (type = "multiple") => ({
   isNew: true, // 👈 add this (important)
 
   dirtyFields: {
+    question_id: true,
     question: true,
     type: true,
     layout: true,
@@ -18,8 +19,8 @@ const createEmptyQuestion = (type = "multiple") => ({
   },
 });
 const createOption = (questionId, label = "", value = "") => ({
-  id: Date.now() + Math.random(),
-  questionId,
+  option_id: Date.now() + Math.random(),
+  question_id: questionId,
   label,
   value,
   isDirty: true,
@@ -28,7 +29,7 @@ const createOption = (questionId, label = "", value = "") => ({
   dirtyFields: {
     label: true,
     value: true,
-    questionId: true,
+    question_id: true,
   },
 });
 
@@ -44,10 +45,10 @@ export const useQuizStore = create((set) => ({
       const q = createEmptyQuestion("multiple");
 
       const newOptions = [
-        createOption(q.id, "", "A"),
-        createOption(q.id, "", "B"),
-        createOption(q.id, "", "C"),
-        createOption(q.id, "", "D"),
+        createOption(q.question_id, "", "A"),
+        createOption(q.question_id, "", "B"),
+        createOption(q.question_id, "", "C"),
+        createOption(q.question_id, "", "D"),
       ];
 
       return {
@@ -70,7 +71,7 @@ export const useQuizStore = create((set) => ({
   updateQuestion: (id, updatedQuestion) =>
     set((state) => ({
       questions: state.questions.map((q) =>
-        q.id === id
+        q.question_id === id
           ? {
               ...q,
               ...updatedQuestion,
@@ -89,7 +90,7 @@ export const useQuizStore = create((set) => ({
   updateOption: (id, updatedOption) =>
     set((state) => ({
       options: state.options.map((opt) =>
-        opt.id === id
+        opt.option_id === id
           ? {
               ...opt,
               ...updatedOption,
@@ -107,22 +108,28 @@ export const useQuizStore = create((set) => ({
     })),
   removeQuestion: (questionId) =>
     set((state) => {
-      const q = state.questions.find((question) => question.id === questionId);
+      const q = state.questions.find(
+        (question) => question.question_id === questionId,
+      );
       console.log("Removing question", questionId, "question:", q);
       return {
         questions: state.questions.filter(
-          (question) => question.id !== questionId,
+          (question) => question.question_id !== questionId,
         ),
-        options: state.options.filter((opt) => opt.questionId !== q.id),
+        options: state.options.filter(
+          (opt) => opt.question_id !== q.question_id,
+        ),
         deletedQuestions: q.isNew
           ? state.deletedQuestions
-          : [...state.deletedQuestions, q.id],
+          : [...state.deletedQuestions, q.question_id],
       };
     }),
 
   duplicateQuestion: (questionId) =>
     set((state) => {
-      const index = state.questions.findIndex((q) => q.id === questionId);
+      const index = state.questions.findIndex(
+        (q) => q.question_id === questionId,
+      );
 
       if (index === -1) return state;
 
@@ -131,16 +138,16 @@ export const useQuizStore = create((set) => ({
 
       const newQuestion = {
         ...q,
-        id: newId,
+        question_id: newId,
         isDirty: true,
       };
 
       const newOptions = state.options
-        .filter((opt) => opt.questionId === q.id)
+        .filter((opt) => opt.question_id === q.question_id)
         .map((opt) => ({
           ...opt,
-          id: Date.now() + Math.random(),
-          questionId: newId,
+          option_id: Date.now() + Math.random(),
+          question_id: newId,
           isDirty: true,
         }));
 
@@ -155,14 +162,16 @@ export const useQuizStore = create((set) => ({
 
   addQuestionAfter: (questionId, type) =>
     set((state) => {
-      const index = state.questions.findIndex((q) => q.id === questionId);
+      const index = state.questions.findIndex(
+        (q) => q.question_id === questionId,
+      );
 
       if (index === -1) return state;
 
       // ✅ create question properly with type
       const newQuestion = {
         ...createEmptyQuestion(),
-        id: Date.now(),
+        question_id: Date.now(),
         type,
       };
 
@@ -170,17 +179,17 @@ export const useQuizStore = create((set) => ({
 
       if (type === "multiple") {
         newOptions = [
-          createOption(newQuestion.id, "", "A"),
-          createOption(newQuestion.id, "", "B"),
-          createOption(newQuestion.id, "", "C"),
-          createOption(newQuestion.id, "", "D"),
+          createOption(newQuestion.question_id, "", "A"),
+          createOption(newQuestion.question_id, "", "B"),
+          createOption(newQuestion.question_id, "", "C"),
+          createOption(newQuestion.question_id, "", "D"),
         ];
       }
 
       if (type === "boolean") {
         newOptions = [
-          createOption(newQuestion.id, "True", "A"),
-          createOption(newQuestion.id, "False", "B"),
+          createOption(newQuestion.question_id, "True", "A"),
+          createOption(newQuestion.question_id, "False", "B"),
         ];
       }
 
@@ -198,7 +207,9 @@ export const useQuizStore = create((set) => ({
   clearDirty: ({ questions = [], options = [], details = [] }) =>
     set((state) => ({
       questions: state.questions.map((q) => {
-        const match = questions.find((item) => item.id === q.id);
+        const match = questions.find(
+          (item) => item.question_id === q.question_id,
+        );
         if (!match) return q;
 
         const newDirtyFields = { ...q.dirtyFields };
@@ -216,7 +227,7 @@ export const useQuizStore = create((set) => ({
       }),
 
       options: state.options.map((opt) => {
-        const match = options.find((item) => item.id === opt.id);
+        const match = options.find((item) => item.option_id === opt.option_id);
         if (!match) return opt;
 
         const newDirtyFields = { ...opt.dirtyFields };

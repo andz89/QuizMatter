@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 import { useQuizStore } from "../../store/QuizStore";
 const QuestionInput = ({ id, order }) => {
   const question = useQuizStore(
-    (state) => state.questions.find((q) => q.id === id),
+    (state) => state.questions.find((q) => q.question_id === id),
     (a, b) => a?.question === b?.question,
   );
 

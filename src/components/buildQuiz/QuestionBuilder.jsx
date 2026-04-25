@@ -12,6 +12,27 @@ import { useQuizStore } from "../../store/QuizStore";
 import ErrorModal from "../modal/ErrorModal";
 import PublishSettingsModal from "../modal/PublishSettingsModal";
 import { useSaveQuiz } from "../hooks/useSaveQuiz";
+function normalizeSingleQuiz(quiz) {
+  const questions = [];
+  const options = [];
+
+  quiz.questions?.forEach((q) => {
+    questions.push({
+      ...q,
+      isDirty: false,
+    });
+
+    q.options?.forEach((opt) => {
+      options.push({
+        ...opt,
+        question_id: q.question_id,
+        isDirty: false,
+      });
+    });
+  });
+
+  return { questions, options };
+}
 export default function QuestionBuilder({ quiz }) {
   const {
     questions,
@@ -29,7 +50,7 @@ export default function QuestionBuilder({ quiz }) {
 
   const [manualSave, setManualSave] = useState(false);
 
-  // ✅ compute dirty state (for UI only)
+  //  compute dirty state (for UI only)
   const dirtyQuestions = questions.filter((q) => q.isDirty);
   const dirtyOptions = options.filter((o) => o.isDirty);
   const dirtyDetails = details?.isDirty;
@@ -40,37 +61,48 @@ export default function QuestionBuilder({ quiz }) {
     dirtyDetails ||
     deletedQuestions.length > 0;
 
-  // ✅ NOW define ref AFTER
   const saveRef = useRef(handleSave);
   useEffect(() => {
     saveRef.current = handleSave;
   }, [handleSave]);
 
-  // ✅ INTERVAL AUTOSAVE (stable, no reset)
+  //  INTERVAL AUTOSAVE (stable, no reset)
   useEffect(() => {
     const interval = setInterval(() => {
       saveRef.current(); // always latest, but interval never resets
     }, 15000);
-
+    if (!isDirty) return; // if not dirty, don't set interval
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
-    if (!quiz) return; // guard
+    if (!quiz || quiz.length === 0) return;
 
-    if (questions.length === 0) {
-      addQuestion();
+    const currentQuiz = quiz;
+
+    if (currentQuiz.questions.length > 0) {
+      const { questions, options } = normalizeSingleQuiz(currentQuiz);
+
+      useQuizStore.setState({
+        questions,
+        options,
+      });
     }
 
     setDetails({
-      quizId: quiz.id,
-      title: quiz.title || "",
-      description: quiz.description || "",
-      grade: quiz.grade || "",
-      subject: quiz.subject || "",
-      quarter: quiz.quarter || "",
-      objectives: quiz.objectives || "",
+      quizId: currentQuiz.id,
+      title: currentQuiz.title || "",
+      description: currentQuiz.description || "",
+      grade: currentQuiz.grade || "",
+      subject: currentQuiz.subject || "",
+      quarter: currentQuiz.quarter || "",
+      objectives: currentQuiz.objectives || "",
     });
+
+    if (currentQuiz.questions.length === 0) {
+      // only add question if DB has none
+      addQuestion();
+    }
   }, [quiz]);
   const handlePublish = (settings) => {
     console.log("Publishing with settings:", settings);
@@ -136,17 +168,18 @@ export default function QuestionBuilder({ quiz }) {
 
           {questions?.map((q, index) => {
             const questionOptions = options.filter(
-              (opt) => opt.questionId === q.id,
+              (opt) => opt.question_id === q.question_id,
             );
 
             return (
-              <div key={q.id} className="p-6 border border-gray-200">
+              <div key={q.question_id} className="p-6 border border-gray-200">
                 <div className="flex flex-col gap-4">
                   {/* Question */}
-                  <QuestionInput id={q.id} order={index} />
+
+                  <QuestionInput id={q.question_id} order={index} />
                   {/* Layout */}
                   {q.type !== "short" && (
-                    <LayoutOptions id={q.id} layoutData={q.layout} />
+                    <LayoutOptions id={q.question_id} layoutData={q.layout} />
                   )}
 
                   {/* Fill in the blank */}
@@ -163,7 +196,7 @@ export default function QuestionBuilder({ quiz }) {
                       }`}
                     >
                       {questionOptions.map((opt) => (
-                        <MultipleChoicesInput key={opt.id} opt={opt} />
+                        <MultipleChoicesInput key={opt.option_id} opt={opt} />
                       ))}
 
                       {/* Footer */}
@@ -171,7 +204,7 @@ export default function QuestionBuilder({ quiz }) {
                   )}
                   <div className="flex items-center justify-end gap-3 mt-5 w-full">
                     <QuestionFooter
-                      questionId={q.id}
+                      questionId={q.question_id}
                       setOpenMenu={setOpenMenu}
                       openMenu={openMenu}
                     />

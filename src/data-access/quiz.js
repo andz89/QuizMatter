@@ -10,20 +10,21 @@ export async function requireUser() {
     data: { user },
     error,
   } = await supabase.auth.getUser();
-
-  if (error || !user) {
+  if (!user) {
     redirect("/login");
   }
+  if (error || !user) {
+    throw new Error("Unauthorized");
+  }
 
-  const userInfo = {
-    id: user.id,
-    email: user.email,
-    name:
-      user.user_metadata?.full_name || user.user_metadata?.name || user.email,
-    avatar: user.user_metadata?.avatar_url || null,
+  return {
+    supabase,
+    user: {
+      id: user.id,
+      email: user.email,
+      displayName: user.user_metadata?.displayName || user.email,
+    },
   };
-
-  return { supabase, user: userInfo };
 }
 
 export async function createQuiz() {
@@ -76,7 +77,15 @@ export async function getQuizById(id) {
 
   const { data, error } = await supabase
     .from("quizzes")
-    .select("*")
+    .select(
+      `
+      *,
+      questions (
+        *,
+        options (*)
+      )
+    `,
+    )
     .eq("id", id)
     .single();
 

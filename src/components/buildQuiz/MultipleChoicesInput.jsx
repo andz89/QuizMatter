@@ -7,16 +7,16 @@ const MultipleChoicesInput = ({ opt }) => {
 
   const ref = useRef(null);
 
-  const question = questions.find((q) => q.id === opt.questionId);
+  const question = questions.find((q) => q.question_id === opt.question_id);
 
   const handleOptionChange = (value) => {
-    updateOption(opt.id, {
+    updateOption(opt.option_id, {
       label: value,
     });
   };
 
   const handleCorrectChange = () => {
-    updateQuestion(opt.questionId, {
+    updateQuestion(opt.question_id, {
       correct: opt.value,
     });
   };

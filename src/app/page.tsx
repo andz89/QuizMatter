@@ -13,7 +13,7 @@ export default async function Home() {
         <div>
           <h1 className="text-3xl font-bold">Quizzes</h1>
           <p className="text-sm text-gray-500">
-            Welcome, <span className="font-medium">{user.name}</span>
+            Welcome, <span className="font-medium">{user.displayName}</span>
           </p>
         </div>
 
