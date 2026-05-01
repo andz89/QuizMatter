@@ -17,35 +17,80 @@ export async function POST(req) {
     if (!Array.isArray(questions) || !Array.isArray(options)) {
       throw new Error("Invalid payload");
     }
-    if (!Array.isArray(questions)) {
-      throw new Error("Invalid payload");
-    }
-    const questionsWithUser = questions.map((q) => ({
+    const questionsWithUser = questions.map(({ isNew, ...q }) => ({
       ...q,
+      isNew,
       user_id: user.id,
     }));
 
-    const optionsWithUser = options.map((o) => ({
+    const optionsWithUser = options.map(({ isNew, ...o }) => ({
       ...o,
+      isNew,
       user_id: user.id,
     }));
     console.log("Received payload:", {
       options: optionsWithUser,
     });
-    // Upsert questions
-    const { error: qError } = await supabase
-      .from("questions")
-      .upsert(questionsWithUser, { onConflict: "question_id" });
-    console.log("Upsert questions result:", { qError });
-    if (qError) throw qError;
+    // Save only changed question columns. New rows are inserted, existing rows
+    // are patched so omitted columns keep their current database values.
+    for (const question of questionsWithUser) {
+      const { question_id, isNew, ...values } = question;
 
-    // Upsert options
-    const { error: oError } = await supabase
-      .from("options")
-      .upsert(optionsWithUser, { onConflict: "option_id" });
+      if (!question_id) {
+        throw new Error("Missing question_id");
+      }
 
-    console.log("options upsert result:", optionsWithUser);
-    if (oError) throw oError;
+      if (isNew) {
+        const { error } = await supabase.from("questions").insert({
+          question_id,
+          ...values,
+        });
+        if (error) throw error;
+        continue;
+      }
+
+      const { data, error } = await supabase
+        .from("questions")
+        .update(values)
+        .eq("question_id", question_id)
+        .eq("user_id", user.id)
+        .select("question_id");
+
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        throw new Error(`Question update failed: ${question_id} not found`);
+      }
+    }
+
+    // Save only changed option columns.
+    for (const option of optionsWithUser) {
+      const { option_id, isNew, ...values } = option;
+
+      if (!option_id) {
+        throw new Error("Missing option_id");
+      }
+
+      if (isNew) {
+        const { error } = await supabase.from("options").insert({
+          option_id,
+          ...values,
+        });
+        if (error) throw error;
+        continue;
+      }
+
+      const { data, error } = await supabase
+        .from("options")
+        .update(values)
+        .eq("option_id", option_id)
+        .eq("user_id", user.id)
+        .select("option_id");
+
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        throw new Error(`Option update failed: ${option_id} not found`);
+      }
+    }
 
     // Delete removed questions
     if (deletedQuestions.length) {
@@ -74,13 +119,15 @@ export async function POST(req) {
         .from("quizzes")
         .update({
           ...details,
-          owner_id: user.id,
+          user_id: user.id,
         })
         .eq("id", details.id) // ✅ keep as string
-        .eq("owner_id", user.id)
+        .eq("user_id", user.id)
         .select();
 
       console.log("Update result:", data);
+
+      if (dError) throw dError;
 
       if (!data || data.length === 0) {
         throw new Error("Update failed: no matching row");

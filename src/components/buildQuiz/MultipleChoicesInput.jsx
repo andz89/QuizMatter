@@ -50,9 +50,18 @@ const MultipleChoicesInput = ({
   }, [opt.label]);
 
   if (!question) return null;
+  useEffect(() => {
+    if (!ref.current) return;
 
+    // 🔥 prevent cursor reset
+    if (document.activeElement === ref.current) return;
+
+    if (ref.current.innerText !== opt.label) {
+      ref.current.innerText = opt.label || "";
+    }
+  }, [opt.label]);
   return (
-    <div className="flex flex-row    ">
+    <div className="flex flex-row    px-2">
       {/* FIXED label (does NOT move) */}
       {showLabel && (
         <span className="w-[20px] font-bold mt-[6px]">
@@ -64,13 +73,8 @@ const MultipleChoicesInput = ({
       <div
         ref={setNodeRef}
         style={style}
-        className="flex flex-row items-start gap-1 flex-1  w-full "
+        className="flex flex-row items-start  flex-1  w-full ml-2"
       >
-        {/* Drag handle */}
-        <span {...listeners} {...attributes} className="cursor-grab mt-[6px]  ">
-          <BiGridVertical size={20} className="text-gray-600 " />
-        </span>
-
         {/* Radio */}
         <label className="flex items-start mt-[11px] ">
           <input
@@ -80,14 +84,28 @@ const MultipleChoicesInput = ({
             className="ml-[-1] px-0"
           />
         </label>
-
+        {/* Drag handle */}
+        <span
+          {...listeners}
+          {...attributes}
+          className="cursor-grab mt-[6px] mr-[-4px] "
+        >
+          <BiGridVertical size={21} className="text-gray-600 " />
+        </span>
         {/* Editable */}
         <div
           ref={ref}
           contentEditable
           suppressContentEditableWarning
           className="focus:outline-none bg-gray-50 border border-gray-300 rounded p-1 w-full min-h-[30px]"
-          onInput={(e) => handleOptionChange(e.currentTarget.textContent)}
+          onInput={(e) => handleOptionChange(e.currentTarget.innerText)}
+          onPaste={(e) => {
+            e.preventDefault();
+
+            const text = e.clipboardData.getData("text/plain");
+
+            document.execCommand("insertText", false, text);
+          }}
         />
 
         {/* Delete */}

@@ -5,6 +5,13 @@ export function buildQuizPayload({
   deletedQuestions,
   deletedOptions,
 }) {
+  const pick = (source, keys) =>
+    Object.fromEntries(
+      keys
+        .filter((key) => source[key] !== undefined)
+        .map((key) => [key, source[key]]),
+    );
+
   const dirtyQuestions = questions.filter((q) => q.isDirty);
   const dirtyOptions = options.filter((o) => o.isDirty);
   const dirtyDetails = details?.isDirty;
@@ -19,7 +26,9 @@ export function buildQuizPayload({
   if (!hasChanges) return null;
 
   const questionPayload = dirtyQuestions.map((q) => {
-    const fields = Object.keys(q.dirtyFields || {});
+    const fields = q.isNew
+      ? ["question", "type", "layout", "correct", "showLabel", "order"]
+      : Object.keys(q.dirtyFields || {});
     const updatedFields = fields.reduce((acc, key) => {
       acc[key] = q[key];
       return acc;
@@ -27,19 +36,20 @@ export function buildQuizPayload({
     return {
       quiz_id: details.quizId,
       question_id: q.question_id,
+      isNew: q.isNew,
       ...updatedFields,
     };
   });
 
   const optionPayload = dirtyOptions.map((o) => {
-    const fields = Object.keys(o.dirtyFields || {});
-    const updatedFields = fields.reduce((acc, key) => {
-      acc[key] = o[key];
-      return acc;
-    }, {});
+    const updatedFields = o.isNew
+      ? pick(o, ["label", "order"])
+      : pick(o, Object.keys(o.dirtyFields || {}));
+
     return {
       option_id: o.option_id,
       question_id: o.question_id,
+      isNew: o.isNew,
       ...updatedFields,
     };
   });

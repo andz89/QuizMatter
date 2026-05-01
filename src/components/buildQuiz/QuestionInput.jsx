@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { useQuizStore } from "../../store/QuizStore";
-const QuestionInput = ({ id, order }) => {
+const QuestionInput = ({ id, index }) => {
   const question = useQuizStore(
     (state) => state.questions.find((q) => q.question_id === id),
     (a, b) => a?.question === b?.question,
@@ -23,7 +23,7 @@ const QuestionInput = ({ id, order }) => {
 
   return (
     <div className="bg-gray-50 border border-gray-300 p-1 flex">
-      <span className="font-bold text-gray-600">{order + 1}.</span>
+      <span className="font-bold text-gray-600">{index + 1}.</span>
 
       <div
         ref={ref}
@@ -32,9 +32,21 @@ const QuestionInput = ({ id, order }) => {
         className="w-full min-h-[40px] focus:outline-none"
         onInput={(e) =>
           updateQuestion(id, {
-            question: e.currentTarget.textContent?.trimStart() || "",
+            question: e.currentTarget.innerText.trimStart(),
           })
         }
+        onPaste={(e) => {
+          e.preventDefault();
+
+          // get plain text only
+          let text = e.clipboardData.getData("text/plain");
+
+          // optional: normalize line breaks
+          text = text.replace(/\r\n/g, "\n");
+
+          // insert at cursor
+          document.execCommand("insertText", false, text);
+        }}
       />
     </div>
   );

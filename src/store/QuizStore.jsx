@@ -7,6 +7,7 @@ const createEmptyQuestion = (type = "multiple") => ({
   type,
   layout: "col",
   correct: "",
+  order: 0,
   isDirty: true,
   isNew: true, // 👈 add this (important)
   showLabel: true, // ✅ default ON
@@ -17,13 +18,14 @@ const createEmptyQuestion = (type = "multiple") => ({
     layout: true,
     correct: true,
     showLabel: true, // ✅ track this
+    order: true,
   },
 });
-const createOption = (questionId, label = "") => ({
+const createOption = (questionId, order) => ({
   option_id: Date.now() + Math.random(),
   question_id: questionId,
-  label,
-  order: 0,
+  label: "",
+  order: order,
   isDirty: true,
   isNew: true, // 👈 add this
 
@@ -43,6 +45,84 @@ export const useQuizStore = create((set) => ({
   details: {},
 
   setDetails: (details) => set({ details }),
+  moveQuestionUp: (id) =>
+    set((state) => {
+      const index = state.questions.findIndex((q) => q.question_id === id);
+      if (index <= 0) return state;
+
+      const newQuestions = [...state.questions];
+      [newQuestions[index - 1], newQuestions[index]] = [
+        newQuestions[index],
+        newQuestions[index - 1],
+      ];
+
+      return {
+        questions: newQuestions.map((q, i) => ({
+          ...q,
+          order: i,
+          isDirty: true,
+          dirtyFields: {
+            ...(q.dirtyFields || {}),
+            order: true, // ✅ correct
+          },
+        })),
+      };
+    }),
+
+  moveQuestionDown: (id) =>
+    set((state) => {
+      const index = state.questions.findIndex((q) => q.question_id === id);
+      if (index === -1 || index === state.questions.length - 1) return state;
+
+      const newQuestions = [...state.questions];
+      [newQuestions[index], newQuestions[index + 1]] = [
+        newQuestions[index + 1],
+        newQuestions[index],
+      ];
+
+      return {
+        questions: newQuestions.map((q, i) => ({
+          ...q,
+          order: i,
+          isDirty: true,
+          dirtyFields: {
+            ...(q.dirtyFields || {}),
+            order: true, // ✅ correct
+          },
+        })),
+      };
+    }),
+  moveQuestionTo: (id, targetIndex) =>
+    set((state) => {
+      const currentIndex = state.questions.findIndex(
+        (q) => q.question_id === id,
+      );
+
+      if (currentIndex === -1) return state;
+
+      const safeIndex = Math.max(
+        0,
+        Math.min(targetIndex, state.questions.length - 1),
+      );
+      // if (currentIndex === safeIndex) return state;
+
+      const newQuestions = [...state.questions];
+      const [movedItem] = newQuestions.splice(currentIndex, 1);
+      newQuestions.splice(safeIndex, 0, movedItem);
+
+      return {
+        questions: newQuestions.map((q, i) => ({
+          ...q,
+          order: i,
+          isDirty: true,
+          dirtyFields: {
+            ...(q.dirtyFields || {}),
+            order: true, // ✅ correct
+          },
+        })),
+        lastMovedId: id, // 👈 optional helper
+      };
+    }),
   updateQuestionLabelVisibility: (question_id, value) =>
     set((state) => ({
       questions: state.questions.map((q) => {
@@ -62,7 +142,7 @@ export const useQuizStore = create((set) => ({
   addQuestion: () =>
     set((state) => {
       const q = createEmptyQuestion("multiple");
-      const newOptions = [createOption(q.question_id, "", "1")];
+      const newOptions = [createOption(q.question_id, 0)];
 
       return {
         questions: [...state.questions, q],
@@ -71,17 +151,15 @@ export const useQuizStore = create((set) => ({
     }),
   addOption: (question_id) =>
     set((state) => {
-      console.log("Adding option to question", state.options);
       const currentOptions = state.options.filter(
         (opt) => opt.question_id === question_id,
       );
-
       // ✅ safer than length
-      const maxOrder = currentOptions.length
-        ? Math.max(...currentOptions.map((o) => o.order ?? 0))
-        : -1;
+      const maxOrder = currentOptions.length;
+      // ? Math.max(...currentOptions.map((o) => o.order ?? 0))
+      // : -1;
 
-      const newOption = [createOption(question_id, "", maxOrder + 1)];
+      const newOption = [createOption(question_id, maxOrder)];
 
       return {
         options: [...state.options, ...newOption],
@@ -142,7 +220,7 @@ export const useQuizStore = create((set) => ({
       const q = state.questions.find(
         (question) => question.question_id === questionId,
       );
-      console.log("Removing question", questionId, "question:", q);
+
       return {
         questions: state.questions.filter(
           (question) => question.question_id !== questionId,
@@ -184,6 +262,15 @@ export const useQuizStore = create((set) => ({
         ...q,
         question_id: newId,
         isDirty: true,
+        isNew: true,
+        dirtyFields: {
+          question: true,
+          type: true,
+          layout: true,
+          correct: true,
+          showLabel: true,
+          order: true,
+        },
       };
 
       const newOptions = state.options
@@ -193,6 +280,12 @@ export const useQuizStore = create((set) => ({
           option_id: Date.now() + Math.random(),
           question_id: newId,
           isDirty: true,
+          isNew: true,
+          dirtyFields: {
+            label: true,
+            question_id: true,
+            order: true,
+          },
         }));
 
       const newQuestions = [...state.questions];
@@ -203,62 +296,54 @@ export const useQuizStore = create((set) => ({
         options: [...state.options, ...newOptions],
       };
     }),
-
   addQuestionAfter: (questionId, type) =>
     set((state) => {
-      if (questionId === null) {
-        const newQuestion = {
-          ...createEmptyQuestion(type),
-          question_id: Date.now(),
-          type,
-        };
-        let newOptions = [];
+      const sorted = [...state.questions].sort(
+        (a, b) => (a.order ?? 0) - (b.order ?? 0),
+      );
 
-        if (type === "multiple") {
-          newOptions = [createOption(newQuestion.question_id, "", "1")];
-        }
+      let currentIndex =
+        questionId === null
+          ? sorted.length - 1
+          : sorted.findIndex((q) => q.question_id === questionId);
 
-        // ✅ short = no options (correct)
+      if (currentIndex === -1 && questionId !== null) return state;
 
-        const newQuestions = [...state.questions];
-        newQuestions.splice(newQuestions.length, 0, newQuestion);
+      const newQuestion = {
+        ...createEmptyQuestion(type),
+        question_id: crypto.randomUUID(),
+        type,
+        order: 0,
+      };
 
-        return {
-          questions: newQuestions,
-          options: [...state.options, ...newOptions],
-        };
-      } else {
-        const index = state.questions.findIndex(
-          (q) => q.question_id === questionId,
-        );
-
-        if (index === -1) return state;
-
-        // ✅ create question properly with type
-        const newQuestion = {
-          ...createEmptyQuestion(),
-          question_id: Date.now(),
-          type,
-        };
-
-        let newOptions = [];
-
-        if (type === "multiple") {
-          newOptions = [createOption(newQuestion.question_id, "", "1")];
-        }
-
-        // ✅ short = no options (correct)
-
-        const newQuestions = [...state.questions];
-        newQuestions.splice(index, 0, newQuestion);
-
-        return {
-          questions: newQuestions,
-          options: [...state.options, ...newOptions],
-        };
+      let newOptions = [];
+      if (type === "multiple") {
+        newOptions = [createOption(newQuestion.question_id, 0)];
       }
-    }),
 
+      const insertIndex = currentIndex + 1;
+
+      sorted.splice(insertIndex, 0, newQuestion);
+
+      const updated = sorted.map((q, i) => {
+        if (i < insertIndex) return q;
+
+        return {
+          ...q,
+          order: i,
+          isDirty: true,
+          dirtyFields: {
+            ...(q.dirtyFields || {}),
+            order: true,
+          },
+        };
+      });
+
+      return {
+        questions: updated,
+        options: [...state.options, ...newOptions],
+      };
+    }),
   clearDirty: ({ questions = [], options = [], details = [] }) =>
     set((state) => ({
       questions: state.questions.map((q) => {
@@ -293,6 +378,7 @@ export const useQuizStore = create((set) => ({
 
         return {
           ...opt,
+          isNew: false,
           dirtyFields: newDirtyFields,
           isDirty: Object.keys(newDirtyFields).length > 0,
         };
