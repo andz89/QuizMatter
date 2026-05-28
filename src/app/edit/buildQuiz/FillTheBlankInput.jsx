@@ -1,5 +1,6 @@
 import React from "react";
-import { useQuizStore } from "../../store/QuizStore";
+
+import { useQuizStore } from "@/src/app/edit/buildQuiz/store/QuizStore";
 
 const FillTheBlankInput = ({ index }) => {
   const { questions, updateQuestion } = useQuizStore();

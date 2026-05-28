@@ -1,5 +1,5 @@
-import { useQuizStore } from "../../store/QuizStore";
-import { useState } from "react";
+import { useQuizStore } from "../buildQuiz/store/QuizStore";
+
 import QuizTypeOptions from "./QuizTypeOptions";
 import {
   BiDuplicate,
@@ -7,7 +7,6 @@ import {
   BiSolidTrash,
   BiChevronDown,
   BiChevronUp,
-  BiRightArrowAlt,
 } from "react-icons/bi";
 
 const QuestionFooter = ({
@@ -22,9 +21,6 @@ const QuestionFooter = ({
   const { removeQuestion, duplicateQuestion } = useQuizStore();
   const moveUp = useQuizStore((state) => state.moveQuestionUp);
   const moveDown = useQuizStore((state) => state.moveQuestionDown);
-  const moveTo = useQuizStore((state) => state.moveQuestionTo);
-
-  const [target, setTarget] = useState("");
 
   if (index < 0 || index >= questionLength) {
     // optional: show error or ignore
@@ -33,42 +29,8 @@ const QuestionFooter = ({
   return (
     <div
       ref={isActive ? activeRef : null}
-      className="flex w-full items-center justify-between gap-2"
+      className="flex w-full items-center justify-end gap-2"
     >
-      <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md border border-gray-200 w-fit">
-        <input
-          type="number"
-          min="1"
-          placeholder="#"
-          value={target}
-          onChange={(e) => setTarget(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              const index = parseInt(target, 10) - 1;
-              if (!isNaN(index)) {
-                moveTo(questionId, index);
-                setTarget("");
-              }
-            }
-          }}
-          className="w-12 text-sm text-center bg-transparent outline-none 
-               placeholder-gray-400"
-        />
-
-        <button
-          onClick={() => {
-            const index = parseInt(target, 10) - 1;
-            if (!isNaN(index)) {
-              moveTo(questionId, index);
-              setTarget("");
-            }
-          }}
-          className="p-1 rounded hover:bg-gray-200 transition"
-          title="Move"
-        >
-          <BiRightArrowAlt className="text-lg text-gray-600" />
-        </button>
-      </div>
       <div className="flex gap-2">
         <div className="flex gap-2">
           <button

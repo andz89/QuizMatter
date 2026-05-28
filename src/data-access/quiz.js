@@ -1,5 +1,6 @@
 // homeActions
 "use server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "../app/utils/supabase/server";
 
 import { redirect } from "next/navigation";
@@ -20,36 +21,79 @@ export async function requireUser() {
   return {
     supabase,
     user: {
-      id: user.id,
-      email: user.email,
-      displayName: user.user_metadata?.displayName || user.email,
+      id: user?.id,
+      email: user?.email,
+      displayName: user?.user_metadata?.displayName || user?.email,
     },
   };
 }
 
-export async function createQuiz() {
+export async function createQuizDetails(formData) {
   const { supabase, user } = await requireUser();
 
+  const payload = {
+    title: formData.get("title"),
+    grade: formData.get("grade"),
+    subject: formData.get("subject"),
+    quarter: formData.get("quarter"),
+    objectives: formData.get("objectives"),
+    user_id: user.id,
+  };
+  console.log(payload);
   const { data, error } = await supabase
     .from("quizzes")
-    .insert([
-      {
-        title: "Untitled Quiz",
-        grade: "grade 1",
-        owner_id: user.id, // 🔥 important for ownership
-      },
-    ])
+    .insert(payload)
     .select()
     .single();
 
   if (error) {
-    console.error("Create quiz error:", error);
-    return;
+    console.error(error);
+    throw new Error("Failed to create quiz");
   }
 
   redirect(`/edit/${data.id}`);
 }
+export async function updateQuizDetails(formData) {
+  const { supabase, user } = await requireUser();
 
+  const id = formData.get("id");
+
+  const payload = {
+    title: formData.get("title"),
+    grade: formData.get("grade"),
+    subject: formData.get("subject"),
+    quarter: formData.get("quarter"),
+    objectives: formData.get("objectives"),
+  };
+
+  const { data, error } = await supabase
+    .from("quizzes")
+    .update(payload)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+export async function deleteQuiz(id) {
+  const { supabase, user } = await requireUser();
+
+  const { error } = await supabase
+    .from("quizzes")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", user.id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  revalidatePath("/");
+}
 export async function getQuiz() {
   const { supabase, user } = await requireUser();
 

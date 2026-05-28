@@ -1,11 +1,11 @@
 "use client";
 import { useCallback, useRef, useState } from "react";
 
-import { useQuizStore } from "../../store/QuizStore";
-import { buildQuizPayload } from "../utils/buildQuizPayload";
-import { de } from "zod/v4/locales";
+import { useQuizStore } from "../store/QuizStore";
+import { buildQuizPayload } from "./buildQuizPayload";
+
 const saveQuiz = async (payload) => {
-  const res = await fetch("/api/saveQuiz", {
+  const res = await fetch("/edit/api/saveQuiz", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

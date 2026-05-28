@@ -2,7 +2,7 @@
 
 import { updateSession } from "./src/app/utils/supabase/updateSession";
 
-export async function proxy(request) {
+export async function middleware(request) {
   const { response } = await updateSession(request);
   return response;
 }

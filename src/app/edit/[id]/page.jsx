@@ -1,6 +1,7 @@
 import React from "react";
 
-import QuestionBuilder from "../../../components/buildQuiz/QuestionBuilder";
+import QuestionBuilder from "@/src/app/edit/buildQuiz/QuestionBuilder";
+
 import { getQuizById } from "../../../data-access/quiz";
 export default async function Page({ params }) {
   const { id } = await params;

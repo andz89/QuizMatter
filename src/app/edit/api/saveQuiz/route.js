@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireUser } from "../../../data-access/quiz";
+import { requireUser } from "../../../../data-access/quiz";
 
 export async function POST(req) {
   try {

@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, use } from "react";
-import { useQuizStore } from "../../store/QuizStore";
+import { useQuizStore } from "../buildQuiz/store/QuizStore";
 import { BsX } from "react-icons/bs";
 import { BiGridVertical } from "react-icons/bi";
 import { useSortable } from "@dnd-kit/sortable";

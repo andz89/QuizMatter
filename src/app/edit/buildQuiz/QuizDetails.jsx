@@ -1,5 +1,5 @@
 import React from "react";
-import { useQuizStore } from "../../store/QuizStore";
+import { useQuizStore } from "../buildQuiz/store/QuizStore";
 
 const QuizDetails = () => {
   const { details, updateDetails } = useQuizStore();
@@ -13,6 +13,7 @@ const QuizDetails = () => {
         <div className="flex flex-col">
           <label className="text-sm text-gray-600 mb-1">Quiz Title</label>
           <input
+            placeholder="Untitled"
             value={details.title || ""}
             onChange={(e) => updateDetails("title", e.target.value)}
             className="border border-gray-300 rounded px-3 py-2"
@@ -31,7 +32,6 @@ const QuizDetails = () => {
             onChange={(e) => updateDetails("grade", e.target.value)}
             className="border border-gray-300 rounded px-3 py-2"
           >
-            <option value="">Select Grade</option>
             {Array.from({ length: 10 }, (_, i) => {
               const grade = `Grade ${i + 1}`;
               return (
@@ -54,7 +54,6 @@ const QuizDetails = () => {
             onChange={(e) => updateDetails("subject", e.target.value)}
             className="border border-gray-300 rounded px-3 py-2"
           >
-            <option value="">Select Subject</option>
             <option value="Math">Math</option>
             <option value="Filipino">Filipino</option>
             <option value="MAPEH">MAPEH</option>
@@ -74,7 +73,6 @@ const QuizDetails = () => {
             onChange={(e) => updateDetails("quarter", e.target.value)}
             className="border border-gray-300 rounded px-3 py-2"
           >
-            <option value="">Select Quarter</option>
             <option value="1st">1st Quarter</option>
             <option value="2nd">2nd Quarter</option>
             <option value="3rd">3rd Quarter</option>

@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import { useQuizStore } from "../../store/QuizStore";
+import { useQuizStore } from "../buildQuiz/store/QuizStore";
 const QuestionInput = ({ id, index }) => {
   const question = useQuizStore(
     (state) => state.questions.find((q) => q.question_id === id),

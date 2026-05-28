@@ -1,25 +1,24 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import QuizDetails from "./QuizDetails";
 import QuestionInput from "./QuestionInput";
 import LayoutOptions from "./LayoutOptions";
 import MultipleChoicesInput from "./MultipleChoicesInput";
 import FillTheBlankInput from "./FillTheBlankInput";
 import QuestionFooter from "./QuestionFooter";
-import { useQuizStore } from "../../store/QuizStore";
+import { useQuizStore } from "../buildQuiz/store/QuizStore";
 import { DndContext, closestCenter } from "@dnd-kit/core";
+import toast from "react-hot-toast";
 
-import QuizTypeOptions from "./QuizTypeOptions";
 import {
   SortableContext,
   verticalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable";
 
-import ErrorModal from "../modal/ErrorModal";
-import PublishSettingsModal from "../modal/PublishSettingsModal";
-import { useSaveQuiz } from "../hooks/useSaveQuiz";
+import PublishSettingsModal from "../../../components/modal/PublishSettingsModal";
+import { useSaveQuiz } from "./utils/useSaveQuiz";
 function normalizeSingleQuiz(quiz) {
   const questions = [];
   const options = [];
@@ -56,7 +55,7 @@ export default function QuestionBuilder({ quiz }) {
     addQuestionAfter,
   } = useQuizStore();
   const [openMenuBelow, setOpenMenuBelow] = useState(false);
-  const { handleSave, sending, error, setError } = useSaveQuiz();
+  const { handleSave, sending, error } = useSaveQuiz();
   const [openMenu, setOpenMenu] = useState(null);
   const [openPublishModal, setOpenPublishModal] = useState(false);
 
@@ -78,7 +77,9 @@ export default function QuestionBuilder({ quiz }) {
   useEffect(() => {
     saveRef.current = handleSave;
   }, [handleSave]);
-
+  useEffect(() => {
+    toast.error(error?.message);
+  }, [error]);
   //  INTERVAL AUTOSAVE (stable, no reset)
   // useEffect(() => {
   //   const interval = setInterval(() => {
@@ -150,7 +151,7 @@ export default function QuestionBuilder({ quiz }) {
   return (
     <div className="bg-white min-h-screen mb-40">
       {/* quiz header */}
-      <div className="fixed top-0   py-2 bg-gray-50 z-10 flex items-center gap-4 w-full justify-end px-6 border-b border-gray-200 ">
+      <div className="fixed top-0   py-2 bg-gray-50 z-51 flex items-center gap-4 w-full justify-end px-6 border-b border-gray-200 ">
         <div className="">
           <span
             className={`px-4 py-2 rounded   ${
@@ -160,13 +161,13 @@ export default function QuestionBuilder({ quiz }) {
             {manualSave ? "Saving..." : "Auto saving..."}
           </span>
         </div>
-        <ErrorModal
+        {/* <ErrorModal
           isOpen={!!error}
           onClose={() => setError(null)}
           title="Save Failed"
           message={error?.message}
           type={error?.type}
-        />
+        /> */}
         <button
           onClick={() => {
             setManualSave(true);

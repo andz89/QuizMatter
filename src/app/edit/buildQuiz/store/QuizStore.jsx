@@ -92,37 +92,7 @@ export const useQuizStore = create((set) => ({
         })),
       };
     }),
-  moveQuestionTo: (id, targetIndex) =>
-    set((state) => {
-      const currentIndex = state.questions.findIndex(
-        (q) => q.question_id === id,
-      );
 
-      if (currentIndex === -1) return state;
-
-      const safeIndex = Math.max(
-        0,
-        Math.min(targetIndex, state.questions.length - 1),
-      );
-      // if (currentIndex === safeIndex) return state;
-
-      const newQuestions = [...state.questions];
-      const [movedItem] = newQuestions.splice(currentIndex, 1);
-      newQuestions.splice(safeIndex, 0, movedItem);
-
-      return {
-        questions: newQuestions.map((q, i) => ({
-          ...q,
-          order: i,
-          isDirty: true,
-          dirtyFields: {
-            ...(q.dirtyFields || {}),
-            order: true, // ✅ correct
-          },
-        })),
-        lastMovedId: id, // 👈 optional helper
-      };
-    }),
   updateQuestionLabelVisibility: (question_id, value) =>
     set((state) => ({
       questions: state.questions.map((q) => {
@@ -177,6 +147,7 @@ export const useQuizStore = create((set) => ({
         },
       },
     })),
+
   updateQuestion: (id, updatedQuestion) =>
     set((state) => ({
       questions: state.questions.map((q) =>

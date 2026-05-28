@@ -1,5 +1,5 @@
 import React from "react";
-import { useQuizStore } from "../../store/QuizStore";
+import { useQuizStore } from "../buildQuiz/store/QuizStore";
 const QuizTypeOptions = ({ questionId, setOpenMenu }) => {
   const { addQuestionAfter } = useQuizStore();
 
