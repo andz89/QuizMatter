@@ -1,7 +1,8 @@
 // stores/quizStore.js
 import { create } from "zustand";
 
-const createEmptyQuestion = (type = "multiple") => ({
+const createEmptyQuestion = (type = "multiple", quizId) => ({
+  quizId: quizId,
   question_id: Date.now(),
   question: "",
   type,
@@ -109,16 +110,16 @@ export const useQuizStore = create((set) => ({
         };
       }),
     })),
-  addQuestion: () =>
-    set((state) => {
-      const q = createEmptyQuestion("multiple");
-      const newOptions = [createOption(q.question_id, 0)];
+  // addQuestion: () =>
+  //   set((state) => {
+  //     const q = createEmptyQuestion("multiple");
+  //     const newOptions = [createOption(q.question_id, 0)];
 
-      return {
-        questions: [...state.questions, q],
-        options: [...state.options, ...newOptions],
-      };
-    }),
+  //     return {
+  //       questions: [...state.questions, q],
+  //       options: [...state.options, ...newOptions],
+  //     };
+  //   }),
   addOption: (question_id) =>
     set((state) => {
       const currentOptions = state.options.filter(
@@ -282,6 +283,7 @@ export const useQuizStore = create((set) => ({
 
       const newQuestion = {
         ...createEmptyQuestion(type),
+        quizId: state.details.quizId,
         question_id: crypto.randomUUID(),
         type,
         order: 0,

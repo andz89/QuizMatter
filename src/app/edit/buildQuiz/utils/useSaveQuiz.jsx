@@ -27,7 +27,7 @@ export function useSaveQuiz() {
   const {
     questions,
     options,
-    details,
+
     clearDirty,
     deletedQuestions,
     deletedOptions,
@@ -39,16 +39,13 @@ export function useSaveQuiz() {
 
   const handleSave = useCallback(async () => {
     if (isSavingRef.current) return;
-    if (!details?.quizId) return;
 
     const dirtyQuestions = questions.filter((q) => q.isDirty);
     const dirtyOptions = options.filter((o) => o.isDirty);
-    const dirtyDetails = details?.isDirty;
 
     if (
       dirtyQuestions.length === 0 &&
       dirtyOptions.length === 0 &&
-      !dirtyDetails &&
       deletedQuestions.length === 0 &&
       deletedOptions.length === 0
     ) {
@@ -61,7 +58,7 @@ export function useSaveQuiz() {
       const payload = buildQuizPayload({
         questions,
         options,
-        details,
+
         deletedQuestions,
         deletedOptions,
       });
@@ -71,16 +68,15 @@ export function useSaveQuiz() {
       const {
         questions: questionPayload,
         options: optionPayload,
-        details: detailsPayload,
+
         dirtyQuestions,
         dirtyOptions,
-        dirtyDetails,
       } = payload;
 
       console.log("Saving...", {
         questions: questionPayload,
         options: optionPayload,
-        details: detailsPayload,
+
         deletedQuestions,
         deletedOptions,
       });
@@ -89,7 +85,7 @@ export function useSaveQuiz() {
       await saveQuiz({
         questions: questionPayload,
         options: optionPayload,
-        details: detailsPayload,
+
         deletedQuestions,
         deletedOptions,
       });
@@ -103,7 +99,6 @@ export function useSaveQuiz() {
           option_id: o.option_id,
           fields: Object.keys(o.dirtyFields || {}),
         })),
-        details: dirtyDetails ? Object.keys(details.dirtyFields || {}) : [],
       });
     } catch (err) {
       setError({
@@ -114,14 +109,7 @@ export function useSaveQuiz() {
       isSavingRef.current = false;
       setSending(false);
     }
-  }, [
-    questions,
-    options,
-    details,
-    clearDirty,
-    deletedQuestions,
-    deletedOptions,
-  ]);
+  }, [questions, options, clearDirty, deletedQuestions, deletedOptions]);
 
   return {
     handleSave,

@@ -1,7 +1,7 @@
-import Quizes from "../components/homePage/Quizes";
+import Quizes from "./components/Quizes";
 import { redirect } from "next/navigation";
 
-import { createQuizDetails, getQuiz } from "../data-access/quiz";
+import { getQuiz } from "../../data-access/quiz";
 
 export default async function Home() {
   const quizzes = await getQuiz();

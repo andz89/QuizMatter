@@ -9,7 +9,7 @@ export async function POST(req) {
     const {
       questions = [],
       options = [],
-      details,
+
       deletedQuestions = [],
       deletedOptions = [],
     } = body;
@@ -112,27 +112,7 @@ export async function POST(req) {
       console.log(deletedOptions, "options deleted");
       if (dError) throw dError;
     }
-    if (details && typeof details === "object") {
-      if (!details.id) throw new Error("Missing details.id");
-      console.log("Updating quiz details:", details.id);
-      const { data, error: dError } = await supabase
-        .from("quizzes")
-        .update({
-          ...details,
-          user_id: user.id,
-        })
-        .eq("id", details.id) // ✅ keep as string
-        .eq("user_id", user.id)
-        .select();
 
-      console.log("Update result:", data);
-
-      if (dError) throw dError;
-
-      if (!data || data.length === 0) {
-        throw new Error("Update failed: no matching row");
-      }
-    }
     return NextResponse.json({ success: true });
   } catch (err) {
     const status = err.message === "Unauthorized" ? 401 : 500;

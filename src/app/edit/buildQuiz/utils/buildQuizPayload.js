@@ -1,7 +1,7 @@
 export function buildQuizPayload({
   questions,
   options,
-  details,
+
   deletedQuestions,
   deletedOptions,
 }) {
@@ -14,12 +14,10 @@ export function buildQuizPayload({
 
   const dirtyQuestions = questions.filter((q) => q.isDirty);
   const dirtyOptions = options.filter((o) => o.isDirty);
-  const dirtyDetails = details?.isDirty;
 
   const hasChanges =
     dirtyQuestions.length > 0 ||
     dirtyOptions.length > 0 ||
-    dirtyDetails ||
     deletedQuestions.length > 0 ||
     deletedOptions.length > 0;
 
@@ -34,7 +32,7 @@ export function buildQuizPayload({
       return acc;
     }, {});
     return {
-      quiz_id: details.quizId,
+      quiz_id: q.quizId,
       question_id: q.question_id,
       isNew: q.isNew,
       ...updatedFields,
@@ -54,23 +52,13 @@ export function buildQuizPayload({
     };
   });
 
-  const detailsPayload = dirtyDetails
-    ? {
-        id: details.quizId,
-        ...Object.fromEntries(
-          Object.keys(details.dirtyFields || {}).map((k) => [k, details[k]]),
-        ),
-      }
-    : null;
-
   return {
     questions: questionPayload,
     options: optionPayload,
-    details: detailsPayload,
+
     deletedQuestions,
     deletedOptions,
     dirtyQuestions,
     dirtyOptions,
-    dirtyDetails,
   };
 }

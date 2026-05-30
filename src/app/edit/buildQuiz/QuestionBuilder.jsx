@@ -10,7 +10,7 @@ import QuestionFooter from "./QuestionFooter";
 import { useQuizStore } from "../buildQuiz/store/QuizStore";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import toast from "react-hot-toast";
-
+import { HiOutlineTv } from "react-icons/hi2";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -19,6 +19,9 @@ import {
 
 import PublishSettingsModal from "../../../components/modal/PublishSettingsModal";
 import { useSaveQuiz } from "./utils/useSaveQuiz";
+import EditQuizDetails from "./EditQuizDetails";
+import Presentation from "@/src/components/presentation/Presentation";
+
 function normalizeSingleQuiz(quiz) {
   const questions = [];
   const options = [];
@@ -44,11 +47,9 @@ function normalizeSingleQuiz(quiz) {
 export default function QuestionBuilder({ quiz }) {
   const {
     questions,
-    addQuestion,
     options,
     updateQuestionLabelVisibility,
     setDetails,
-    details,
     deletedQuestions,
     deletedOptions,
     addOption,
@@ -58,18 +59,18 @@ export default function QuestionBuilder({ quiz }) {
   const { handleSave, sending, error } = useSaveQuiz();
   const [openMenu, setOpenMenu] = useState(null);
   const [openPublishModal, setOpenPublishModal] = useState(false);
+  const [mode, setMode] = useState(null);
 
   const [manualSave, setManualSave] = useState(false);
-
+  const [quizDetails, setQuizDetails] = useState(quiz);
+  const [openEdit, setOpenEdit] = useState(false);
   //  compute dirty state (for UI only)
   const dirtyQuestions = questions.filter((q) => q.isDirty);
   const dirtyOptions = options.filter((o) => o.isDirty);
-  const dirtyDetails = details?.isDirty;
 
   const isDirty =
     dirtyQuestions.length > 0 ||
     dirtyOptions.length > 0 ||
-    dirtyDetails ||
     deletedQuestions.length > 0 ||
     deletedOptions.length > 0;
 
@@ -118,7 +119,9 @@ export default function QuestionBuilder({ quiz }) {
     if (!quiz || quiz.length === 0) return;
 
     const currentQuiz = quiz;
-
+    setDetails({
+      quizId: currentQuiz.id,
+    });
     if (currentQuiz.questions.length > 0) {
       const { questions, options } = normalizeSingleQuiz(currentQuiz);
 
@@ -127,26 +130,23 @@ export default function QuestionBuilder({ quiz }) {
         options,
       });
     }
-
-    setDetails({
-      quizId: currentQuiz.id,
-      title: currentQuiz.title || "",
-      description: currentQuiz.description || "",
-      grade: currentQuiz.grade || "",
-      subject: currentQuiz.subject || "",
-      quarter: currentQuiz.quarter || "",
-      objectives: currentQuiz.objectives || "",
-    });
-
-    // if (currentQuiz.questions.length === 0) {
-    //   // only add question if DB has none
-    //   addQuestion();
-    // }
   }, [quiz]);
+
   const handlePublish = (settings) => {
     console.log("Publishing with settings:", settings);
 
     // call your API here
+  };
+  const presentationQuiz = {
+    ...quizDetails,
+
+    questions: questions.map((question) => ({
+      ...question,
+
+      options: options
+        .filter((opt) => opt.question_id === question.question_id)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
+    })),
   };
   return (
     <div className="bg-white min-h-screen mb-40">
@@ -161,13 +161,25 @@ export default function QuestionBuilder({ quiz }) {
             {manualSave ? "Saving..." : "Auto saving..."}
           </span>
         </div>
-        {/* <ErrorModal
-          isOpen={!!error}
-          onClose={() => setError(null)}
-          title="Save Failed"
-          message={error?.message}
-          type={error?.type}
-        /> */}
+        <Presentation
+          quiz={presentationQuiz}
+          open={mode === "present"}
+          onClose={() => setMode("view")}
+        />
+        <button
+          onClick={() => {
+            setMode("present");
+          }}
+          className="
+           flex items-center gap-2
+          hover:bg-slate-50   py-1 px-2   
+          transition
+        "
+        >
+          <HiOutlineTv size={22} />
+          Present
+        </button>
+
         <button
           onClick={() => {
             setManualSave(true);
@@ -201,8 +213,13 @@ export default function QuestionBuilder({ quiz }) {
       <div className="max-w-[720px] mx-auto    ">
         <div className="flex flex-col pt-20">
           {/* Quiz Details */}
-          <QuizDetails quiz={quiz} />
-
+          <QuizDetails setOpenEdit={setOpenEdit} quiz={quizDetails} />
+          <EditQuizDetails
+            details={quizDetails}
+            open={openEdit}
+            onClose={() => setOpenEdit(false)}
+            setQuizDetails={setQuizDetails}
+          />
           {/* Questions details end */}
 
           {questions

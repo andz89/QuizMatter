@@ -1,9 +1,16 @@
 import React from "react";
 import { logout } from "../app/auth/actions";
-import { requireUser } from "../data-access/quiz";
+
+import { headers } from "next/headers";
 import UserMenu from "./UserMenu";
 import { createClient } from "@/src/app/utils/supabase/server";
 const Header = async () => {
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname");
+  console.log(pathname);
+  if (pathname?.startsWith("/edit")) {
+    return null;
+  }
   const supabase = await createClient();
 
   const {

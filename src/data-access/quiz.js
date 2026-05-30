@@ -28,6 +28,7 @@ export async function requireUser() {
   };
 }
 
+//homepage
 export async function createQuizDetails(formData) {
   const { supabase, user } = await requireUser();
 
@@ -53,6 +54,7 @@ export async function createQuizDetails(formData) {
 
   redirect(`/edit/${data.id}`);
 }
+//homepage
 export async function updateQuizDetails(formData) {
   const { supabase, user } = await requireUser();
 
@@ -79,6 +81,7 @@ export async function updateQuizDetails(formData) {
 
   return data;
 }
+//homepage
 export async function deleteQuiz(id) {
   const { supabase, user } = await requireUser();
 
@@ -94,14 +97,22 @@ export async function deleteQuiz(id) {
 
   revalidatePath("/");
 }
+//homepage
 export async function getQuiz() {
   const { supabase, user } = await requireUser();
 
   const { data, error } = await supabase
     .from("quizzes")
-    .select("*")
-    .eq("user_id", user.id) // 🔥 filter by user
-    .order("created_at", { ascending: false });
+    .select(
+      `
+      *,
+      questions (
+        *,
+        options (*)
+      )
+    `,
+    )
+    .eq("user_id", user.id); // 🔥 filter by user
 
   if (error) {
     console.error("Get quiz error:", error);
@@ -111,6 +122,7 @@ export async function getQuiz() {
   return data;
 }
 
+//edit page
 export async function getQuizById(id) {
   if (!id) {
     console.error("Quiz ID is missing");
