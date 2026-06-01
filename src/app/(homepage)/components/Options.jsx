@@ -1,12 +1,12 @@
 import Link from "next/link";
 import React from "react";
 import {
-  HiOutlinePlus,
   HiTrash,
   HiMiniPencilSquare,
   HiEllipsisVertical,
   HiOutlineTv,
 } from "react-icons/hi2";
+import { BsArrowsAngleExpand } from "react-icons/bs";
 
 const Options = ({
   quiz,
@@ -18,19 +18,29 @@ const Options = ({
   setDeleteId,
 }) => {
   return (
-    <div className=" flex items-center justify-between -ml-7  border-t border-slate-100 relative">
-      <button
-        onClick={() => setOpenMenuId(openMenuId === quiz.id ? null : quiz.id)}
-        className="
+    <div className=" flex items-center justify-between -ml-12 border-t border-slate-100 relative">
+      <div className="flex items-center gap-1">
+        <BsArrowsAngleExpand
+          onClick={() => {
+            setQuizDetails(quiz);
+            setMode("present");
+          }}
+          size={17}
+          className="  text-slate-800 hover:text-orange-500 transition  cursor-pointer"
+        />
+        <button
+          onClick={() => setOpenMenuId(openMenuId === quiz.id ? null : quiz.id)}
+          className="
  text-slate-200
       hover:bg-slate-100
       transition
       cursor-pointer
-      ml-2
+      
     "
-      >
-        <HiEllipsisVertical size={25} className="text-slate-600" />
-      </button>
+        >
+          <HiEllipsisVertical size={25} className="text-slate-600" />
+        </button>
+      </div>
 
       {/* Dropdown Menu */}
       {openMenuId === quiz.id && (
@@ -60,21 +70,6 @@ const Options = ({
               <HiMiniPencilSquare size={22} />
               Edit Questions
             </Link>
-
-            <button
-              onClick={() => {
-                setQuizDetails(quiz);
-                setMode("present");
-              }}
-              className="
-           flex items-center gap-2
-          hover:bg-slate-50   py-1 px-2   
-          transition
-        "
-            >
-              <HiOutlineTv size={22} />
-              Present
-            </button>
 
             <button
               disabled={isDeleting}

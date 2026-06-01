@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { HiMiniPencilSquare, HiOutlineXMark } from "react-icons/hi2";
 import Link from "next/link";
+import { BsArrowsAngleExpand } from "react-icons/bs";
+
 import { HiEye, HiEyeSlash, HiOutlineTv } from "react-icons/hi2";
 const ViewFullDetails = ({ quiz, open, onClose, setMode }) => {
   const [showAnswers, setShowAnswers] = useState(false);
@@ -68,6 +70,24 @@ const ViewFullDetails = ({ quiz, open, onClose, setMode }) => {
                   "
                   >
                     <HiMiniPencilSquare size={22} />
+                  </button>
+                  <button
+                    className="
+                    shrink-0
+                    mt-1
+                    p-1.5 rounded-lg
+                    bg-slate-100
+                    text-slate-600
+                    hover:bg-orange-100
+                    hover:text-orange-600
+                    transition
+                    cursor-pointer"
+                    onClick={() => setMode("present")}
+                  >
+                    <BsArrowsAngleExpand
+                      size={20}
+                      className="  text-slate-800 hover:text-orange-500 transition  cursor-pointer  "
+                    />
                   </button>
                   <button
                     className="
@@ -163,48 +183,66 @@ const ViewFullDetails = ({ quiz, open, onClose, setMode }) => {
           {/* Example */}
 
           <div className="space-y-4 text-left">
-            {quiz?.questions?.map((question, index) => (
-              <div
-                key={question.id}
-                className="
+            {quiz?.questions
+              ?.slice()
+              .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+              .map((question, index) => (
+                <div
+                  key={question.id}
+                  className="
         p-5 rounded-2xl
         border border-slate-200
-        bg-slate-50
+        bg-slate-50 
       "
-              >
-                {/* Question */}
-                <h4 className="font-semibold text-slate-800 mb-4">
-                  {index + 1}. {question.question}
-                </h4>
-
-                {/* Options */}
-                <div className="space-y-2">
-                  {question.options?.map((option, optionIndex) => (
+                >
+                  {/* Question */}
+                  <h4 className=" flex  font-semibold text-slate-800 mb-4 min-h-[40px] p-2 focus:outline-none [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6">
+                    <span className="mr-1"> {index + 1}. </span>
                     <div
-                      key={option.id}
-                      className="
-              px-4 py-3 rounded-xl
-              bg-white
-              border border-slate-200
-              text-slate-700
-            "
-                    >
-                      <span className="font-medium mr-2">
-                        {String.fromCharCode(65 + optionIndex)}.
-                      </span>
+                      dangerouslySetInnerHTML={{
+                        __html: question.question,
+                      }}
+                    />
+                  </h4>
 
-                      {option.label}
+                  {/* Options */}
+                  <div
+                    className={`gap-2    ${
+                      question.layout === "row"
+                        ? "flex flex-row flex-wrap justify-around"
+                        : question.layout === "grid"
+                          ? "grid grid-cols-2 w-full"
+                          : "flex flex-col flex-base"
+                    }`}
+                  >
+                    {question.options
+                      ?.slice()
+                      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                      .map((option, optionIndex) => (
+                        <div
+                          key={option.id}
+                          className={`flex px-4 py-2 text-slate-700 border border-slate-300 rounded-lg ${
+                            showAnswers && question.correct === option.option_id
+                              ? "bg-green-200"
+                              : "bg-white"
+                          }`}
+                        >
+                          {question.showLabel && (
+                            <span className="font-medium mr-2">
+                              {String.fromCharCode(65 + optionIndex)}.
+                            </span>
+                          )}
 
-                      {showAnswers && question.correct === option.option_id && (
-                        <span className="ml-2 text-green-600 font-medium">
-                          ✓ Correct
-                        </span>
-                      )}
-                    </div>
-                  ))}
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: option.label,
+                            }}
+                          />
+                        </div>
+                      ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
 
@@ -235,26 +273,12 @@ const ViewFullDetails = ({ quiz, open, onClose, setMode }) => {
             >
               {showAnswers ? <HiEyeSlash size={18} /> : <HiEye size={18} />}
 
-              <span className="text-sm font-medium">
+              {/* <span className="text-sm font-medium">
                 {showAnswers ? "Hide Answers" : "Show Answers"}
-              </span>
+              </span> */}
             </button>
           </div>
           <div className="flex items-center justify-end gap-3">
-            <button
-              onClick={() => setMode("present")}
-              className="
-           flex items-center gap-2
-          hover:bg-orange-200    px-4 py-2   rounded-xl
-           text-orange-700
-                    bg-orange-100
-                    border border-orange-200
-          transition
-        "
-            >
-              <HiOutlineTv size={22} />
-              Present
-            </button>
             <Link
               href={`/edit/${quiz.id}`}
               target="_blank"

@@ -10,18 +10,18 @@ import QuestionFooter from "./QuestionFooter";
 import { useQuizStore } from "../buildQuiz/store/QuizStore";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import toast from "react-hot-toast";
-import { HiOutlineTv } from "react-icons/hi2";
+
 import {
   SortableContext,
   verticalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable";
-
+import { BsArrowsAngleExpand } from "react-icons/bs";
 import PublishSettingsModal from "../../../components/modal/PublishSettingsModal";
 import { useSaveQuiz } from "./utils/useSaveQuiz";
 import EditQuizDetails from "./EditQuizDetails";
 import Presentation from "@/src/components/presentation/Presentation";
-
+import FloatingToolbar from "./editor/FloatingToolbar";
 function normalizeSingleQuiz(quiz) {
   const questions = [];
   const options = [];
@@ -55,6 +55,8 @@ export default function QuestionBuilder({ quiz }) {
     addOption,
     addQuestionAfter,
   } = useQuizStore();
+  const [activeEditor, setActiveEditor] = useState(null); //tiny
+
   const [openMenuBelow, setOpenMenuBelow] = useState(false);
   const { handleSave, sending, error } = useSaveQuiz();
   const [openMenu, setOpenMenu] = useState(null);
@@ -79,7 +81,9 @@ export default function QuestionBuilder({ quiz }) {
     saveRef.current = handleSave;
   }, [handleSave]);
   useEffect(() => {
-    toast.error(error?.message);
+    if (!error?.message) return;
+
+    toast.error(error.message);
   }, [error]);
   //  INTERVAL AUTOSAVE (stable, no reset)
   // useEffect(() => {
@@ -148,65 +152,72 @@ export default function QuestionBuilder({ quiz }) {
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
     })),
   };
+
   return (
     <div className="bg-white min-h-screen mb-40">
       {/* quiz header */}
-      <div className="fixed top-0   py-2 bg-gray-50 z-51 flex items-center gap-4 w-full justify-end px-6 border-b border-gray-200 ">
-        <div className="">
-          <span
-            className={`px-4 py-2 rounded   ${
-              sending ? "bg-yellow-100 text-yellow-800 " : "opacity-0"
+      <PublishSettingsModal
+        isOpen={openPublishModal}
+        onClose={() => setOpenPublishModal(false)}
+        onPublish={handlePublish}
+      />
+      <Presentation
+        quiz={presentationQuiz}
+        open={mode === "present"}
+        onClose={() => setMode("view")}
+      />
+      <div className="fixed top-0 py-2 bg-gray-50 z-51 flex items-center justify-between border-b border-gray-200 w-full px-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold leading-tight">
+            <span className="text-blue-900">Quiz </span>{" "}
+            <span className="text-orange-400">Matter</span>
+          </h1>
+        </div>
+
+        {/* Center */}
+        <div className="absolute left-1/2 -translate-x-1/2">
+          <FloatingToolbar editor={activeEditor} />
+        </div>
+        <div className="  flex items-center gap-3">
+          <button
+            onClick={() => {
+              setMode("present");
+            }}
+            className="
+          mx-2
+          cursor-pointer
+        "
+          >
+            <BsArrowsAngleExpand
+              size={22}
+              className="text-2xl text-slate-800 hover:text-orange-500 transition  "
+            />
+          </button>
+
+          <button
+            onClick={() => {
+              setManualSave(true);
+              handleSave();
+            }}
+            disabled={sending || !isDirty}
+            className={`px-4 py-2 rounded shadow-sm ${
+              sending
+                ? "bg-gray-400"
+                : !isDirty
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-blue-500 text-white cursor-pointer"
             }`}
           >
-            {manualSave ? "Saving..." : "Auto saving..."}
-          </span>
-        </div>
-        <Presentation
-          quiz={presentationQuiz}
-          open={mode === "present"}
-          onClose={() => setMode("view")}
-        />
-        <button
-          onClick={() => {
-            setMode("present");
-          }}
-          className="
-           flex items-center gap-2
-          hover:bg-slate-50   py-1 px-2   
-          transition
-        "
-        >
-          <HiOutlineTv size={22} />
-          Present
-        </button>
+            Save
+          </button>
 
-        <button
-          onClick={() => {
-            setManualSave(true);
-            handleSave();
-          }}
-          disabled={sending || !isDirty}
-          className={`px-4 py-2 rounded shadow-sm ${
-            sending
-              ? "bg-gray-400"
-              : !isDirty
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-blue-500 text-white cursor-pointer"
-          }`}
-        >
-          Save
-        </button>
-        <PublishSettingsModal
-          isOpen={openPublishModal}
-          onClose={() => setOpenPublishModal(false)}
-          onPublish={handlePublish}
-        />
-        <button
-          onClick={() => setOpenPublishModal(true)}
-          className={`cursor-pointer px-4 py-2 rounded shadow-sm bg-green-700 text-white `}
-        >
-          Publish
-        </button>
+          <button
+            onClick={() => setOpenPublishModal(true)}
+            className={`cursor-pointer px-4 py-2 rounded shadow-sm bg-green-700 text-white `}
+          >
+            Publish
+          </button>
+        </div>
       </div>
       {/* quiz header end */}
 
@@ -243,10 +254,14 @@ export default function QuestionBuilder({ quiz }) {
                       index={q.order}
                     />
                   </div>
-                  <div className="flex flex-col gap-4 p-2 border border-gray-200 rounded">
+                  <div className="flex flex-col gap-4 p-2 border border-gray-200 rounded w-full">
                     {/* Question */}
 
-                    <QuestionInput id={q.question_id} index={index} />
+                    <QuestionInput
+                      id={q.question_id}
+                      index={index}
+                      setActiveEditor={setActiveEditor}
+                    />
                     {/* Layout */}
                     {q.type !== "short" && (
                       <LayoutOptions id={q.question_id} layoutData={q.layout} />
@@ -261,7 +276,7 @@ export default function QuestionBuilder({ quiz }) {
                       <div
                         className={`gap-2    ${
                           q.layout === "row"
-                            ? "flex flex-row flex-wrap justify-around"
+                            ? "flex flex-row flex-wrap  min-w-10"
                             : q.layout === "grid"
                               ? "grid grid-cols-2 w-full"
                               : "flex flex-col flex-base"
@@ -348,6 +363,7 @@ export default function QuestionBuilder({ quiz }) {
                                       key={opt.option_id}
                                       opt={opt}
                                       index={index}
+                                      setActiveEditor={setActiveEditor}
                                       questionOptionsLength={
                                         questionOptions.length
                                       }

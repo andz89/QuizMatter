@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { HiMiniPencilSquare, HiOutlineXMark } from "react-icons/hi2";
 import Link from "next/link";
 import { HiEye, HiEyeSlash, HiOutlineTv } from "react-icons/hi2";
+import { BsArrowsAngleContract } from "react-icons/bs";
 const Presentation = ({ quiz, open, onClose }) => {
   const [showAnswers, setShowAnswers] = useState(false);
   const [visibleAnswers, setVisibleAnswers] = useState({});
@@ -50,7 +51,7 @@ const Presentation = ({ quiz, open, onClose }) => {
     }));
   };
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-1 bg-white">
+    <div className="fixed inset-0 z-52 flex flex-col justify-center   bg-white">
       <div
         className="
           w-full  
@@ -66,7 +67,7 @@ const Presentation = ({ quiz, open, onClose }) => {
             bg-white/90 backdrop-blur-md
             border-b border-slate-100
 
-            p-1
+            p-5
             rounded-t-3xl
           "
         >
@@ -83,23 +84,6 @@ const Presentation = ({ quiz, open, onClose }) => {
                 >
                   {quiz?.title || "Untitled"}
                 </h2>
-                <div className="flex items-center gap-2">
-                  <button
-                    className="
-                    shrink-0
-                    mt-1
-                    p-1.5 rounded-lg
-                    bg-slate-100
-                    text-slate-600
-                    hover:bg-orange-100
-                    hover:text-orange-600
-                    transition
-                    cursor-pointer"
-                    onClick={onClose}
-                  >
-                    <HiOutlineXMark size={22} />
-                  </button>
-                </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-2 mt-3">
@@ -145,7 +129,7 @@ const Presentation = ({ quiz, open, onClose }) => {
         </div>
 
         {/* Body */}
-        <div className="px-6 py-5 space-y-6">
+        <div className="px-2 py-5 space-y-6">
           {/* Objectives */}
           {!open && (
             <div>
@@ -179,7 +163,7 @@ const Presentation = ({ quiz, open, onClose }) => {
           {/* Add more sections here */}
           {/* Example */}
 
-          <div className="space-y-4 text-left">
+          <div className=" text-left">
             {quiz?.questions
               ?.slice()
               .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
@@ -189,24 +173,14 @@ const Presentation = ({ quiz, open, onClose }) => {
                 return (
                   <div
                     key={question.id}
-                    className="text-slate-800 mb-4 leading-tight"
+                    className="text-slate-800 mb-5 leading-tight border border-gray-400 p-4 rounded-2xl    border border-slate-200
+        bg-slate-50  "
                   >
-                    {/* Question */}
-                    <h4
-                      style={{
-                        fontSize: `clamp(${1.2 * fontSize}rem, ${
-                          2 * fontSize
-                        }vw + 1rem, ${3 * fontSize}rem)`,
-                      }}
-                      className="text-slate-800 mb-4 leading-tight"
-                    >
-                      {index + 1}. {question.question}
-                    </h4>
                     <button
                       onClick={() => toggleQuestionAnswer(question.id)}
                       className="
     flex items-center gap-2
-    px-3 py-2 mb-4
+    px-3 py-2  
     rounded-xl
     bg-slate-100
     hover:bg-slate-200
@@ -220,115 +194,148 @@ const Presentation = ({ quiz, open, onClose }) => {
                       ) : (
                         <HiEye size={18} />
                       )}
-
-                      <span className="text-sm font-medium">
-                        {isAnswerVisible ? "Hide Answer" : "Show Answer"}
-                      </span>
                     </button>
+                    {/* Question */}
+                    <h4
+                      style={{
+                        fontSize: `clamp(${1.2 * fontSize}rem, ${
+                          2 * fontSize
+                        }vw + 1rem, ${3 * fontSize}rem)`,
+                      }}
+                      className="  flex text-slate-800 mb-4 leading-tight min-h-[40px] p-2 focus:outline-none [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6"
+                    >
+                      {index + 1}.{" "}
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: question.question,
+                        }}
+                      />
+                    </h4>
+
                     {/* Options */}
-                    <div className="space-y-2">
-                      {question.options?.map((option, optionIndex) => (
-                        <div
-                          key={option.id}
-                          className="
-  px-4 py-3 rounded-xl
-  bg-white
-  border border-slate-200
-  text-slate-700
-"
-                          style={{
-                            fontSize: `clamp(${1 * fontSize}rem, ${
-                              1.5 * fontSize
-                            }vw + 1rem, ${2.5 * fontSize}rem)`,
-                          }}
-                        >
-                          <span className="font-medium mr-2">
-                            {String.fromCharCode(65 + optionIndex)}.
-                          </span>
-
-                          {option.label}
-
-                          {isAnswerVisible &&
-                            question.correct === option.option_id && (
-                              <span className="ml-2 text-green-600 font-medium">
-                                ✓ Correct
+                    <div
+                      className={`gap-2    ${
+                        question.layout === "row"
+                          ? "flex flex-row flex-wrap justify-around"
+                          : question.layout === "grid"
+                            ? "grid grid-cols-2 w-full"
+                            : "flex flex-col flex-base"
+                      }`}
+                    >
+                      {question.options
+                        ?.slice()
+                        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                        .map((option, optionIndex) => (
+                          <div
+                            key={option.option_id}
+                            className={`flex px-4 py-2 text-slate-700 border border-slate-300 rounded-lg ${
+                              isAnswerVisible &&
+                              question.correct === option.option_id
+                                ? "bg-green-200"
+                                : "bg-white"
+                            }`}
+                            style={{
+                              fontSize: `clamp(${1 * fontSize}rem, ${
+                                1.5 * fontSize
+                              }vw + 1rem, ${2.5 * fontSize}rem)`,
+                            }}
+                          >
+                            {question.showLabel && (
+                              <span className="font-medium mr-2">
+                                {String.fromCharCode(65 + optionIndex)}.
                               </span>
                             )}
-                        </div>
-                      ))}
+                            <div
+                              dangerouslySetInnerHTML={{
+                                __html: option.label,
+                              }}
+                            />
+                          </div>
+                        ))}
                     </div>
                   </div>
                 );
               })}
           </div>
         </div>
-
-        {/* Footer */}
-        <div
-          className="
+      </div>
+      {/* Footer */}
+      <div
+        className="
             sticky bottom-0
-            bg-white/90 backdrop-blur-md
-            border-t border-slate-100
+            bg-slate-800  
+              h-40
             flex justify-between items-center
-            px-6 py-4
-            rounded-b-3xl
+            px-6  
+      
           "
-        >
-          <div className="flex items-center justify-end gap-2 w-full">
-            <button
-              onClick={() => {
-                const next = !showAnswers;
+      >
+        <div className="flex items-center justify-end gap-6 w-full">
+          <div className="flex items-center gap-2"></div>
+          <button
+            onClick={() => {
+              const next = !showAnswers;
 
-                setShowAnswers(next);
+              setShowAnswers(next);
 
-                // when hiding all, also reset individual answers
-                if (!next) {
-                  setVisibleAnswers({});
-                }
-              }}
-              className="
-      flex items-center gap-2
-      px-4 py-2
-      rounded-xl
-      bg-slate-100
-      hover:bg-slate-200
-      text-slate-700
+              // when hiding all, also reset individual answers
+              if (!next) {
+                setVisibleAnswers({});
+              }
+            }}
+            className="
+   
+   
+    
+    
       transition
       cursor-pointer
     "
-            >
-              {showAnswers ? <HiEyeSlash size={18} /> : <HiEye size={18} />}
-
-              <span className="text-sm font-medium">
-                {showAnswers ? "Hide Answers" : "Show Answers"}
-              </span>
-            </button>
+          >
+            <span className="text-lg text-white hover:text-orange-500 transition">
+              {showAnswers ? <HiEyeSlash size={20} /> : <HiEye size={20} />}
+            </span>
+            {/* <span className="text-sm font-medium">
+              {showAnswers ? "Hide Answers" : "Show Answers"}
+            </span> */}
+          </button>
+          <div className="flex items-center gap-4 text-2xl">
             <button
               onClick={() => setFontSize((prev) => Math.max(0.8, prev - 0.1))}
               className="
-      px-4 py-2 rounded-xl
-      bg-slate-100
-      hover:bg-slate-200
-      text-slate-700
-      font-bold
+         cursor-pointer
     "
             >
-              A-
+              <span className=" text-white hover:text-orange-500 transition">
+                A-{" "}
+              </span>
             </button>
-
             <button
               onClick={() => setFontSize((prev) => Math.min(3, prev + 0.1))}
-              className="
-      px-4 py-2 rounded-xl
-      bg-slate-100
-      hover:bg-slate-200
-      text-slate-700
-      font-bold
-    "
+              className="           
+            cursor-pointer
+             "
             >
-              A+
+              <span className="  text-white hover:text-orange-500 transition">
+                {" "}
+                A+
+              </span>
             </button>
           </div>
+          <div className="w-px h-14 bg-slate-300"></div>
+          <button
+            className="
+            p-1.5 rounded-lg
+            text-slate-600
+     
+            cursor-pointer"
+            onClick={onClose}
+          >
+            <BsArrowsAngleContract
+              size={22}
+              className="text-white hover:text-orange-500 transition"
+            />
+          </button>
         </div>
       </div>
     </div>

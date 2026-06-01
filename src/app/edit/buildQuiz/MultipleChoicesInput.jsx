@@ -1,9 +1,11 @@
-import React, { useRef, useEffect, use } from "react";
+import React, { useRef, useEffect, use, useState } from "react";
 import { useQuizStore } from "../buildQuiz/store/QuizStore";
 import { BsX } from "react-icons/bs";
 import { BiGridVertical } from "react-icons/bi";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import TinyInputEditor from "./editor/TinyInputEditor";
+
 const getOptionLabel = (index) => {
   return String.fromCharCode(65 + index); // 65 = "A"
 };
@@ -12,6 +14,7 @@ const MultipleChoicesInput = ({
   index,
   questionOptionsLength,
   showLabel,
+  setActiveEditor,
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: opt.option_id });
@@ -26,9 +29,6 @@ const MultipleChoicesInput = ({
   const removeOption = useQuizStore((state) => state.removeOption);
 
   const questions = useQuizStore((state) => state.questions);
-
-  const ref = useRef(null);
-
   const question = questions.find((q) => q.question_id === opt.question_id);
 
   const handleOptionChange = (value) => {
@@ -43,23 +43,8 @@ const MultipleChoicesInput = ({
     });
   };
 
-  useEffect(() => {
-    if (ref.current && ref.current.innerText !== opt.label) {
-      ref.current.innerText = opt.label || "";
-    }
-  }, [opt.label]);
-
   if (!question) return null;
-  useEffect(() => {
-    if (!ref.current) return;
 
-    // 🔥 prevent cursor reset
-    if (document.activeElement === ref.current) return;
-
-    if (ref.current.innerText !== opt.label) {
-      ref.current.innerText = opt.label || "";
-    }
-  }, [opt.label]);
   return (
     <div className="flex flex-row    px-2">
       {/* FIXED label (does NOT move) */}
@@ -73,7 +58,7 @@ const MultipleChoicesInput = ({
       <div
         ref={setNodeRef}
         style={style}
-        className="flex flex-row items-start  flex-1  w-full ml-2"
+        className="flex flex-row items-start  flex-1    ml-2"
       >
         {/* Radio */}
         <label className="flex items-start mt-[11px] ">
@@ -90,23 +75,17 @@ const MultipleChoicesInput = ({
           {...attributes}
           className="cursor-grab mt-[6px] mr-[-4px] "
         >
-          <BiGridVertical size={21} className="text-gray-600 " />
+          <BiGridVertical size={21} className="text-gray-600 mr-1 " />
         </span>
         {/* Editable */}
-        <div
-          ref={ref}
-          contentEditable
-          suppressContentEditableWarning
-          className="focus:outline-none bg-gray-50 border border-gray-300 rounded p-1 w-full min-h-[30px]"
-          onInput={(e) => handleOptionChange(e.currentTarget.innerText)}
-          onPaste={(e) => {
-            e.preventDefault();
-
-            const text = e.clipboardData.getData("text/plain");
-
-            document.execCommand("insertText", false, text);
-          }}
-        />
+        <div className="bg-gray-50 border border-gray-300  rounded  w-full min-w-0 p-2">
+          <TinyInputEditor
+            value={opt.label || "option here"}
+            onChange={handleOptionChange}
+            setActiveEditor={setActiveEditor}
+            inputFrom={"option"}
+          />
+        </div>
 
         {/* Delete */}
         <button
@@ -114,7 +93,7 @@ const MultipleChoicesInput = ({
           onClick={() => removeOption(opt.option_id)}
           className="cursor-pointer"
         >
-          <BsX size={33} />
+          <BsX size={33} className="text-slate-500 " />
         </button>
       </div>
     </div>

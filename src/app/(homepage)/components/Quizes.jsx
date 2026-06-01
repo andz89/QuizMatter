@@ -4,6 +4,7 @@ import QuizEditDetailsModal from "@/src/app/(homepage)/components/QuizEditDetail
 import { useState } from "react";
 import { HiOutlinePlus } from "react-icons/hi2";
 import { deleteQuiz } from "@/src/data-access/quiz";
+import { BsArrowsAngleExpand } from "react-icons/bs";
 
 import ConfirmDeleteModal from "@/src/components/modal/ConfirmDeleteModal";
 import ViewFullDetails from "./ViewFullDetails";
@@ -109,7 +110,7 @@ export default function Quizes({ quizzesList }) {
                   <div className="flex items-center justify-between gap-2">
                     <h2
                       className="        text-xl font-semibold text-slate-800
-        whitespace-nowrap overflow-hidden text-ellipsis pr-5"
+        whitespace-nowrap overflow-hidden text-ellipsis pr-5 w-[280px]"
                     >
                       {quiz.title ? quiz.title : "Untitled"}
                     </h2>

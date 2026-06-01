@@ -3,6 +3,7 @@ import { useCallback, useRef, useState } from "react";
 
 import { useQuizStore } from "../store/QuizStore";
 import { buildQuizPayload } from "./buildQuizPayload";
+import toast from "react-hot-toast";
 
 const saveQuiz = async (payload) => {
   const res = await fetch("/edit/api/saveQuiz", {
@@ -16,7 +17,6 @@ const saveQuiz = async (payload) => {
   const data = await res.json();
 
   if (!res.ok) {
-    console.error("Save quiz error:", data.error);
     throw new Error(data.error || "Failed to save");
   }
 
@@ -51,7 +51,7 @@ export function useSaveQuiz() {
     ) {
       return;
     }
-
+    const saveToast = toast.loading("Saving...");
     try {
       isSavingRef.current = true;
       setSending(true);
@@ -89,7 +89,9 @@ export function useSaveQuiz() {
         deletedQuestions,
         deletedOptions,
       });
-
+      toast.success("Saved successfully", {
+        id: saveToast,
+      });
       clearDirty({
         questions: dirtyQuestions.map((q) => ({
           question_id: q.question_id,
@@ -103,7 +105,10 @@ export function useSaveQuiz() {
     } catch (err) {
       setError({
         type: "network",
-        message: "Failed to save. Please try again.",
+        message: err?.message || "Network error. Please check your internet.",
+      });
+      toast.error("Failed to save", {
+        id: saveToast,
       });
     } finally {
       isSavingRef.current = false;
