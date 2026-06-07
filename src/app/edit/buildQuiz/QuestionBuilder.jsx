@@ -10,7 +10,7 @@ import QuestionFooter from "./QuestionFooter";
 import { useQuizStore } from "../buildQuiz/store/QuizStore";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import toast from "react-hot-toast";
-
+import { HiTrash } from "react-icons/hi2";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -54,9 +54,12 @@ export default function QuestionBuilder({ quiz }) {
     deletedOptions,
     addOption,
     addQuestionAfter,
+    removeOption,
   } = useQuizStore();
-  const [activeEditor, setActiveEditor] = useState(null); //tiny
 
+  //show delete icon to delete option when focus
+  const [deleteOptionId, setDeleteOptionId] = useState({});
+  const [activeEditor, setActiveEditor] = useState(null); //tiny
   const [openMenuBelow, setOpenMenuBelow] = useState(false);
   const { handleSave, sending, error } = useSaveQuiz();
   const [openMenu, setOpenMenu] = useState(null);
@@ -152,7 +155,10 @@ export default function QuestionBuilder({ quiz }) {
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
     })),
   };
-
+  const handleDeleteOption = () => {
+    console.log("--", deleteOptionId);
+    removeOption(deleteOptionId.option_id);
+  };
   return (
     <div className="bg-white min-h-screen mb-40">
       {/* quiz header */}
@@ -205,7 +211,7 @@ export default function QuestionBuilder({ quiz }) {
                 ? "bg-gray-400"
                 : !isDirty
                   ? "bg-gray-300 cursor-not-allowed"
-                  : "bg-blue-500 text-white cursor-pointer"
+                  : "bg-slate-900 text-white cursor-pointer"
             }`}
           >
             Save
@@ -213,9 +219,9 @@ export default function QuestionBuilder({ quiz }) {
 
           <button
             onClick={() => setOpenPublishModal(true)}
-            className={`cursor-pointer px-4 py-2 rounded shadow-sm bg-green-700 text-white `}
+            className={`cursor-pointer px-4 py-2 rounded shadow-sm bg-orange-500 text-white `}
           >
-            Publish
+            Share
           </button>
         </div>
       </div>
@@ -237,10 +243,6 @@ export default function QuestionBuilder({ quiz }) {
             .slice()
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
             .map((q, index) => {
-              const questionOptions = options
-                .filter((opt) => opt.question_id === q.question_id)
-                .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-
               return (
                 <div key={q.question_id} className="  ">
                   <div className="flex items-center justify-end gap-3  w-full mt-7 mb-1">
@@ -264,12 +266,31 @@ export default function QuestionBuilder({ quiz }) {
                     />
                     {/* Layout */}
                     {q.type !== "short" && (
-                      <LayoutOptions id={q.question_id} layoutData={q.layout} />
+                      <div className=" flex justify-between">
+                        <LayoutOptions
+                          id={q.question_id}
+                          layoutData={q.layout}
+                        />
+                        {deleteOptionId?.option_id &&
+                          deleteOptionId?.question_id === q.question_id && (
+                            <button
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                handleDeleteOption();
+                              }}
+                            >
+                              <HiTrash className="text-slate-500 text-lg cursor-pointer transition" />
+                            </button>
+                          )}
+                      </div>
                     )}
 
                     {/* Fill in the blank */}
                     {q.type === "short" && (
-                      <FillTheBlankInput index={q.order} />
+                      <FillTheBlankInput
+                        question_id={q.question_id}
+                        setActiveEditor={setActiveEditor}
+                      />
                     )}
                     {/* Multiple Choice */}
                     {q.type !== "short" && (
@@ -359,6 +380,7 @@ export default function QuestionBuilder({ quiz }) {
                                 >
                                   {questionOptions.map((opt, index) => (
                                     <MultipleChoicesInput
+                                      setDeleteOptionId={setDeleteOptionId}
                                       showLabel={q.showLabel}
                                       key={opt.option_id}
                                       opt={opt}
@@ -401,7 +423,7 @@ export default function QuestionBuilder({ quiz }) {
                             <div
                               className="w-[30px] h-[14px] bg-gray-300 rounded-full relative
   transition-colors duration-300
-  peer-checked:bg-green-500
+  peer-checked:bg-orange-500
 
   after:content-[''] after:absolute after:top-[1px] after:left-[1px]
   after:bg-white after:border after:border-gray-300
@@ -409,7 +431,7 @@ export default function QuestionBuilder({ quiz }) {
   after:transition-all after:duration-300
 
   peer-checked:after:translate-x-[16px]
-  peer-checked:after:border-green-500
+  peer-checked:after:border-orange-500
   peer-checked:shadow-sm
 "
                             ></div>

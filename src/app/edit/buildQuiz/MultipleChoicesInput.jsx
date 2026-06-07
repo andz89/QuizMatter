@@ -15,6 +15,7 @@ const MultipleChoicesInput = ({
   questionOptionsLength,
   showLabel,
   setActiveEditor,
+  setDeleteOptionId,
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: opt.option_id });
@@ -26,7 +27,7 @@ const MultipleChoicesInput = ({
 
   const updateOption = useQuizStore((state) => state.updateOption);
   const updateQuestion = useQuizStore((state) => state.updateQuestion);
-  const removeOption = useQuizStore((state) => state.removeOption);
+  // const removeOption = useQuizStore((state) => state.removeOption);
 
   const questions = useQuizStore((state) => state.questions);
   const question = questions.find((q) => q.question_id === opt.question_id);
@@ -47,7 +48,6 @@ const MultipleChoicesInput = ({
 
   return (
     <div className="flex flex-row    px-2">
-      {/* FIXED label (does NOT move) */}
       {showLabel && (
         <span className="w-[20px] font-bold mt-[6px]">
           {getOptionLabel(index)}.
@@ -66,35 +66,38 @@ const MultipleChoicesInput = ({
             type="radio"
             checked={question.correct === opt.option_id}
             onChange={handleCorrectChange}
-            className="ml-[-1] px-0"
+            className="mx-2 px-0"
           />
         </label>
         {/* Drag handle */}
-        <span
-          {...listeners}
-          {...attributes}
-          className="cursor-grab mt-[6px] mr-[-4px] "
-        >
-          <BiGridVertical size={21} className="text-gray-600 mr-1 " />
-        </span>
+
         {/* Editable */}
-        <div className="bg-gray-50 border border-gray-300  rounded  w-full min-w-0 p-2">
+        <div className="bg-gray-50 border border-gray-300  rounded  w-full min-w-0 py-1 pl-1 pr-3">
           <TinyInputEditor
+            optionDetails={opt}
             value={opt.label || "option here"}
             onChange={handleOptionChange}
+            setDeleteOptionId={setDeleteOptionId}
             setActiveEditor={setActiveEditor}
             inputFrom={"option"}
           />
         </div>
-
+        <span
+          {...listeners}
+          {...attributes}
+          className="relative cursor-grab mt-[8px] ml-[-12px]  "
+        >
+          <BiGridVertical size={18} className="text-gray-600 mr-1 " />
+        </span>
         {/* Delete */}
-        <button
+        {/* <button
           disabled={questionOptionsLength <= 1}
-          onClick={() => removeOption(opt.option_id)}
+          // onClick={() => removeOption(opt.option_id)}
+          onClick={() => setDeleteOptionId(opt.option_id)}
           className="cursor-pointer"
         >
           <BsX size={33} className="text-slate-500 " />
-        </button>
+        </button> */}
       </div>
     </div>
   );

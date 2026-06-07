@@ -4,7 +4,6 @@ import {
   HiTrash,
   HiMiniPencilSquare,
   HiEllipsisVertical,
-  HiOutlineTv,
 } from "react-icons/hi2";
 import { BsArrowsAngleExpand } from "react-icons/bs";
 

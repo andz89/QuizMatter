@@ -12,12 +12,19 @@ import { useEffect, useState } from "react";
 import { HiBold, HiItalic, HiUnderline, HiListBullet } from "react-icons/hi2";
 
 export default function TinyQuestionEditor({
+  optionDetails,
   value = "",
   onChange,
   index,
   setActiveEditor,
   inputFrom,
+  setDeleteOptionId,
 }) {
+  let data = {
+    option_id: optionDetails?.option_id,
+    question_id: optionDetails?.question_id,
+  };
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -47,11 +54,13 @@ export default function TinyQuestionEditor({
           "min-w-10   min-h-[10px] focus:outline-none text-slate-700 leading-relaxed [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_mark]:bg-yellow-200 [&_mark]:px-1 [&_mark]:rounded",
       },
     },
-
     onFocus: ({ editor }) => {
       setActiveEditor?.(editor);
+      setDeleteOptionId?.(data);
     },
-
+    onBlur: () => {
+      setDeleteOptionId?.({});
+    },
     onUpdate: ({ editor }) => {
       onChange?.(editor.getHTML());
     },

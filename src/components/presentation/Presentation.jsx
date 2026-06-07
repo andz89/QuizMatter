@@ -264,7 +264,7 @@ const Presentation = ({ quiz, open, onClose }) => {
         className="
             sticky bottom-0
             bg-slate-800  
-              h-40
+            
             flex justify-between items-center
             px-6  
       
