@@ -32,7 +32,7 @@ const Header = async () => {
       <div className="flex justify-between px-2 items-center">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold leading-tight">
-            <span className="text-blue-900">Quiz </span>{" "}
+            <span className="text-slate-800">Quiz </span>{" "}
             <span className="text-orange-400">Matter</span>
           </h1>
         </div>

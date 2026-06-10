@@ -1,6 +1,6 @@
 "use client";
 
-import QuizEditDetailsModal from "@/src/app/(homepage)/components/QuizEditDetailsModal";
+import QuizEditDetailsModal from "@/src/app/(homepage)/UI/QuizEditDetailsModal";
 import { useState } from "react";
 import { HiOutlinePlus } from "react-icons/hi2";
 import { deleteQuiz } from "@/src/data-access/quiz";
@@ -36,7 +36,10 @@ export default function Quizes({ quizzesList }) {
   };
 
   return (
-    <div className="min-h-screen ">
+    <div
+      className="min-h-screen "
+      onClick={() => openMenuId && setOpenMenuId(null)}
+    >
       <div className=" w-full mx-auto p-4">
         <ConfirmDeleteModal
           open={!!deleteId}
@@ -74,8 +77,8 @@ export default function Quizes({ quizzesList }) {
             className="
                   flex items-center gap-2
               px-5 py-3 rounded-xl text-white font-medium
-              bg-gradient-to-r from-teal-400 via-cyan-500 to-teal-600
-              shadow-sm hover:opacity-90 transition cursor-pointer
+              bg-gradient-to-r from-orange-400 via-yellow-500 to-orange-600
+              shadow-sm hover:opacity-90 transition cursor-pointer 
             "
           >
             <HiOutlinePlus className="text-[20px]" />

@@ -80,7 +80,9 @@ export function useSaveQuiz() {
         deletedQuestions,
         deletedOptions,
       });
-
+      // SNAPSHOTS MUST BE CREATED BEFORE THE SAVE
+      const deletedQuestionsSnapshot = [...deletedQuestions];
+      const deletedOptionsSnapshot = [...deletedOptions];
       // simulate API
       await saveQuiz({
         questions: questionPayload,
@@ -92,15 +94,30 @@ export function useSaveQuiz() {
       toast.success("Saved successfully", {
         id: saveToast,
       });
+      //this is the original code, which only cleared the dirty fields, but we want to clear all dirty fields after a successful save
+      // clearDirty({
+      //   questions: dirtyQuestions.map((q) => ({
+      //     question_id: q.question_id,
+      //     fields: Object.keys(q.dirtyFields || {}),
+      //   })),
+
+      // this is the update code, which clears the dirty fields if no revision during saving
       clearDirty({
         questions: dirtyQuestions.map((q) => ({
           question_id: q.question_id,
-          fields: Object.keys(q.dirtyFields || {}),
+          dirtyFields: { ...(q.dirtyFields || {}) },
         })),
+        // options: dirtyOptions.map((o) => ({
+        //   option_id: o.option_id,
+        //   fields: Object.keys(o.dirtyFields || {}),
+        // })),
         options: dirtyOptions.map((o) => ({
           option_id: o.option_id,
-          fields: Object.keys(o.dirtyFields || {}),
+          dirtyFields: { ...(o.dirtyFields || {}) },
         })),
+
+        deletedQuestions: deletedQuestionsSnapshot,
+        deletedQuestions: deletedQuestionsSnapshot,
       });
     } catch (err) {
       setError({

@@ -1,4 +1,4 @@
-import { useQuizStore } from "../buildQuiz/store/QuizStore";
+import { useQuizStore } from "./store/QuizStore";
 
 import QuizTypeOptions from "./QuizTypeOptions";
 import {
@@ -9,7 +9,7 @@ import {
   BiChevronUp,
 } from "react-icons/bi";
 
-const QuestionFooter = ({
+const QuestionHeader = ({
   questionLength,
   questionId,
   openMenu,
@@ -101,4 +101,4 @@ const QuestionFooter = ({
   );
 };
 
-export default QuestionFooter;
+export default QuestionHeader;

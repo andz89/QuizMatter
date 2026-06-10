@@ -1,4 +1,4 @@
-import Quizes from "./components/Quizes";
+import Quizes from "./UI/Quizes";
 import { redirect } from "next/navigation";
 
 import { getQuiz } from "../../data-access/quiz";

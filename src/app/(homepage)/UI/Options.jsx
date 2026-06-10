@@ -45,7 +45,7 @@ const Options = ({
       {openMenuId === quiz.id && (
         <div
           className="
-        absolute left-0 top-7
+        absolute right-0 top-7
         w-48
         bg-white
         border border-slate-200

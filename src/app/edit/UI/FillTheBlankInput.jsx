@@ -1,22 +1,25 @@
 import React from "react";
 
-import { useQuizStore } from "@/src/app/edit/buildQuiz/store/QuizStore";
+import { useQuizStore } from "./store/QuizStore";
 import TinyInputEditor from "./editor/TinyInputEditor";
 
 const FillTheBlankInput = ({ question_id, setActiveEditor }) => {
-  const questions = useQuizStore((state) => state.questions);
+  const question = useQuizStore((state) =>
+    state.questions.find((q) => q.question_id === question_id),
+  );
   const updateQuestion = useQuizStore((state) => state.updateQuestion);
   const handleOptionChange = (value) => {
     updateQuestion(question_id, {
       correct: value,
     });
   };
+
   return (
     <div className="flex flex-col gap-1">
       <span className="text-sm text-gray-600">Correct Answer</span>
 
       <TinyInputEditor
-        value={questions[question_id]?.correct || ""}
+        value={question?.correct || ""}
         onChange={handleOptionChange}
         setActiveEditor={setActiveEditor}
       />

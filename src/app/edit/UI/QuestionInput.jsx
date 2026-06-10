@@ -1,6 +1,6 @@
 import React from "react";
-import { useQuizStore } from "../buildQuiz/store/QuizStore";
-import TinyInputEditor from "././editor/TinyInputEditor";
+import { useQuizStore } from "./store/QuizStore";
+import TinyInputEditor from "./editor/TinyInputEditor";
 
 const QuestionInput = ({ id, index, setActiveEditor }) => {
   const question = useQuizStore((state) =>

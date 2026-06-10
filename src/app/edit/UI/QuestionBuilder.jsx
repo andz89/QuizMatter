@@ -6,11 +6,10 @@ import QuestionInput from "./QuestionInput";
 import LayoutOptions from "./LayoutOptions";
 import MultipleChoicesInput from "./MultipleChoicesInput";
 import FillTheBlankInput from "./FillTheBlankInput";
-import QuestionFooter from "./QuestionFooter";
-import { useQuizStore } from "../buildQuiz/store/QuizStore";
+import QuestionHeader from "./QuestionHeader";
+import { useQuizStore } from "./store/QuizStore";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import toast from "react-hot-toast";
-import { HiTrash } from "react-icons/hi2";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -155,10 +154,7 @@ export default function QuestionBuilder({ quiz }) {
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
     })),
   };
-  const handleDeleteOption = () => {
-    console.log("--", deleteOptionId);
-    removeOption(deleteOptionId.option_id);
-  };
+
   return (
     <div className="bg-white min-h-screen mb-40">
       {/* quiz header */}
@@ -175,7 +171,7 @@ export default function QuestionBuilder({ quiz }) {
       <div className="fixed top-0 py-2 bg-gray-50 z-51 flex items-center justify-between border-b border-gray-200 w-full px-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold leading-tight">
-            <span className="text-blue-900">Quiz </span>{" "}
+            <span className="text-slate-800">Quiz </span>
             <span className="text-orange-400">Matter</span>
           </h1>
         </div>
@@ -246,7 +242,7 @@ export default function QuestionBuilder({ quiz }) {
               return (
                 <div key={q.question_id} className="  ">
                   <div className="flex items-center justify-end gap-3  w-full mt-7 mb-1">
-                    <QuestionFooter
+                    <QuestionHeader
                       questionLength={questions.length}
                       questionId={q.question_id}
                       setOpenMenu={setOpenMenu}
@@ -271,17 +267,6 @@ export default function QuestionBuilder({ quiz }) {
                           id={q.question_id}
                           layoutData={q.layout}
                         />
-                        {deleteOptionId?.option_id &&
-                          deleteOptionId?.question_id === q.question_id && (
-                            <button
-                              onMouseDown={(e) => {
-                                e.preventDefault();
-                                handleDeleteOption();
-                              }}
-                            >
-                              <HiTrash className="text-slate-500 text-lg cursor-pointer transition" />
-                            </button>
-                          )}
                       </div>
                     )}
 
@@ -385,6 +370,7 @@ export default function QuestionBuilder({ quiz }) {
                                       key={opt.option_id}
                                       opt={opt}
                                       index={index}
+                                      deleteOptionId={deleteOptionId}
                                       setActiveEditor={setActiveEditor}
                                       questionOptionsLength={
                                         questionOptions.length

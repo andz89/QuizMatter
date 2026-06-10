@@ -105,7 +105,8 @@ export const useQuizStore = create((set) => ({
           isDirty: true,
           dirtyFields: {
             ...(q.dirtyFields || {}),
-            showLabel: true,
+            // showLabel: true, // ✅ this is the original code without comparing
+            showLabel: (q.dirtyFields?.showLabel || 0) + 1, //updated code to compare revision
           },
         };
       }),
@@ -160,7 +161,8 @@ export const useQuizStore = create((set) => ({
               dirtyFields: {
                 ...(q.dirtyFields || {}),
                 ...Object.keys(updatedQuestion).reduce((acc, key) => {
-                  acc[key] = true;
+                  // acc[key] = true;
+                  acc[key] = (q.dirtyFields?.[key] || 0) + 1; // this updated code tracks the number of revisions for each field, so we can compare with the saved version to decide whether to clear the dirty state
                   return acc;
                 }, {}),
               },
@@ -179,7 +181,8 @@ export const useQuizStore = create((set) => ({
               dirtyFields: {
                 ...(opt.dirtyFields || {}),
                 ...Object.keys(updatedOption).reduce((acc, key) => {
-                  acc[key] = true;
+                  // acc[key] = true;
+                  acc[key] = (opt.dirtyFields?.[key] || 0) + 1; // this updated code tracks the number of revisions for each field, so we can compare with the saved version to decide whether to clear the dirty state
                   return acc;
                 }, {}),
               },
@@ -232,6 +235,7 @@ export const useQuizStore = create((set) => ({
 
       const newQuestion = {
         ...q,
+        quizId: state.details.quizId,
         question_id: newId,
         isDirty: true,
         isNew: true,
@@ -317,7 +321,13 @@ export const useQuizStore = create((set) => ({
         options: [...state.options, ...newOptions],
       };
     }),
-  clearDirty: ({ questions = [], options = [], details = [] }) =>
+  clearDirty: ({
+    questions = [],
+    options = [],
+    details = [],
+    deletedQuestions = [],
+    deletedOptions = [],
+  }) =>
     set((state) => ({
       questions: state.questions.map((q) => {
         const match = questions.find(
@@ -327,10 +337,19 @@ export const useQuizStore = create((set) => ({
 
         const newDirtyFields = { ...q.dirtyFields };
 
-        match.fields.forEach((field) => {
-          delete newDirtyFields[field];
-        });
+        //this is the original code without comparing
+        // match.fields.forEach((field) => {
+        //   delete newDirtyFields[field];
+        // });
 
+        Object.entries(match.dirtyFields).forEach(([field, savedVersion]) => {
+          // this code compares the saved version with the current version, only clear the dirty state if they are the same, which means no revision during saving, otherwise keep it dirty
+          const currentVersion = q.dirtyFields?.[field];
+
+          if (currentVersion === savedVersion) {
+            delete newDirtyFields[field];
+          }
+        });
         return {
           ...q,
           isNew: false,
@@ -345,9 +364,22 @@ export const useQuizStore = create((set) => ({
 
         const newDirtyFields = { ...opt.dirtyFields };
 
-        match.fields.forEach((field) => {
-          delete newDirtyFields[field];
-        });
+        // match.fields.forEach((field) => {
+        //   delete newDirtyFields[field];
+        // });
+        Object.entries(match.dirtyFields || {}).forEach(
+          ([field, savedVersion]) => {
+            // this code compares the saved version with the current version, only clear the dirty state if they are the same, which means no revision during saving, otherwise keep it dirty
+            const currentVersion = opt.dirtyFields?.[field];
+
+            if (
+              currentVersion !== undefined &&
+              currentVersion === savedVersion
+            ) {
+              delete newDirtyFields[field];
+            }
+          },
+        );
 
         return {
           ...opt,
@@ -372,8 +404,13 @@ export const useQuizStore = create((set) => ({
             };
           })()
         : state.details,
-      deletedQuestions: [], //
-
-      deletedOptions: [], //
+      // deletedQuestions: [], //
+      deletedQuestions: state.deletedQuestions.filter(
+        (id) => !deletedQuestions.includes(id),
+      ),
+      // deletedOptions: [], //
+      deletedOptions: state.deletedOptions.filter(
+        (id) => !deletedOptions.includes(id),
+      ),
     })),
 }));

@@ -1,10 +1,11 @@
 import React, { useRef, useEffect, use, useState } from "react";
-import { useQuizStore } from "../buildQuiz/store/QuizStore";
+import { useQuizStore } from "./store/QuizStore";
 import { BsX } from "react-icons/bs";
 import { BiGridVertical } from "react-icons/bi";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import TinyInputEditor from "./editor/TinyInputEditor";
+import { HiTrash } from "react-icons/hi2";
 
 const getOptionLabel = (index) => {
   return String.fromCharCode(65 + index); // 65 = "A"
@@ -16,6 +17,7 @@ const MultipleChoicesInput = ({
   showLabel,
   setActiveEditor,
   setDeleteOptionId,
+  deleteOptionId,
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: opt.option_id });
@@ -27,7 +29,7 @@ const MultipleChoicesInput = ({
 
   const updateOption = useQuizStore((state) => state.updateOption);
   const updateQuestion = useQuizStore((state) => state.updateQuestion);
-  // const removeOption = useQuizStore((state) => state.removeOption);
+  const removeOption = useQuizStore((state) => state.removeOption);
 
   const questions = useQuizStore((state) => state.questions);
   const question = questions.find((q) => q.question_id === opt.question_id);
@@ -43,22 +45,22 @@ const MultipleChoicesInput = ({
       correct: opt.option_id,
     });
   };
-
+  const handleDeleteOption = () => {
+    removeOption(deleteOptionId.option_id);
+  };
   if (!question) return null;
 
   return (
-    <div className="flex flex-row    px-2">
+    <div className="flex flex-row ">
       {showLabel && (
-        <span className="w-[20px] font-bold mt-[6px]">
-          {getOptionLabel(index)}.
-        </span>
+        <span className="font-bold mt-[6px]">{getOptionLabel(index)}.</span>
       )}
 
       {/* DRAGGABLE PART ONLY */}
       <div
         ref={setNodeRef}
         style={style}
-        className="flex flex-row items-start  flex-1    ml-2"
+        className="flex flex-row items-start  flex-1 "
       >
         {/* Radio */}
         <label className="flex items-start mt-[11px] ">
@@ -89,6 +91,20 @@ const MultipleChoicesInput = ({
         >
           <BiGridVertical size={18} className="text-gray-600 mr-1 " />
         </span>
+        <div className="relative">
+          {deleteOptionId?.option_id === opt.option_id && (
+            <div className="  absolute bg-slate-200  w-[20px] h-[30px] rounded flex items-center justify-center top-[-27px] right-[-15px]">
+              <button
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  handleDeleteOption();
+                }}
+              >
+                <HiTrash className="text-slate-500 text-lg cursor-pointer transition" />
+              </button>
+            </div>
+          )}
+        </div>
         {/* Delete */}
         {/* <button
           disabled={questionOptionsLength <= 1}

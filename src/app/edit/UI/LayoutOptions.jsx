@@ -1,5 +1,5 @@
 import React from "react";
-import { useQuizStore } from "../buildQuiz/store/QuizStore";
+import { useQuizStore } from "./store/QuizStore";
 
 const LayoutOptions = ({ id, layoutData }) => {
   const updateQuestion = useQuizStore((state) => state.updateQuestion);
