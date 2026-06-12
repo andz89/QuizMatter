@@ -1,15 +1,20 @@
 import React from "react";
 import { useQuizStore } from "./store/QuizStore";
-const QuizTypeOptions = ({ questionId, setOpenMenu }) => {
+const QuizTypeOptions = ({
+  questionId,
+  setOpenMenu,
+  setOpenMenuBelow = () => {},
+}) => {
   const { addQuestionAfter } = useQuizStore();
 
   const handleAdd = (type) => {
     addQuestionAfter(questionId, type);
     setOpenMenu(null);
+    setOpenMenuBelow(false);
   };
 
   return (
-    <div className="absolute left-0 mt-[-125] w-44 bg-white border border-gray-200 rounded-md shadow-lg z-20 py-2">
+    <div>
       <button
         onClick={() => handleAdd("multiple")}
         className="w-full text-left px-3 py-1 text-md hover:bg-gray-100"

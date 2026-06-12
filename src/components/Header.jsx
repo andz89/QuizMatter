@@ -1,5 +1,6 @@
 import React from "react";
 import { logout } from "../app/auth/actions";
+import Image from "next/image";
 
 import { headers } from "next/headers";
 import UserMenu from "./UserMenu";
@@ -31,10 +32,13 @@ const Header = async () => {
     >
       <div className="flex justify-between px-2 items-center">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold leading-tight">
-            <span className="text-slate-800">Quiz </span>{" "}
-            <span className="text-orange-400">Matter</span>
-          </h1>
+          <Image
+            src="/quizmatter-logo.png"
+            alt="School Logo"
+            width={120}
+            height={120}
+            className="object-contain"
+          />
         </div>
         <div>
           <UserMenu user={user} logout={logout} />

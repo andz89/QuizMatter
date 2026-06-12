@@ -1,12 +1,13 @@
 "use client";
-
+import Image from "next/image";
+import addQuestionNumbers from "@/src/app/utils/lib/addQuestionNumbers";
 import { useState, useEffect, useRef } from "react";
 import QuizDetails from "./QuizDetails";
 import QuestionInput from "./QuestionInput";
 import LayoutOptions from "./LayoutOptions";
 import MultipleChoicesInput from "./MultipleChoicesInput";
 import FillTheBlankInput from "./FillTheBlankInput";
-
+import QuizTypeOptions from "./QuizTypeOptions";
 import QuestionHeader from "./QuestionHeader";
 import { useQuizStore } from "./store/QuizStore";
 import { DndContext, closestCenter } from "@dnd-kit/core";
@@ -22,24 +23,7 @@ import { useSaveQuiz } from "./utils/useSaveQuiz";
 import EditQuizDetails from "./EditQuizDetails";
 import Presentation from "@/src/components/presentation/Presentation";
 import FloatingToolbar from "./editor/FloatingToolbar";
-const isQuestion = (type) => ["multiple", "short"].includes(type);
 
-function addQuestionNumbers(items) {
-  let questionNumber = 0;
-
-  return items.map((item) => {
-    if (isQuestion(item.type)) {
-      questionNumber++;
-
-      return {
-        ...item,
-        questionNumber,
-      };
-    }
-
-    return item;
-  });
-}
 function normalizeSingleQuiz(quiz) {
   const questions = [];
   const options = [];
@@ -192,10 +176,13 @@ export default function QuestionBuilder({ quiz }) {
       />
       <div className="fixed top-0 py-2 bg-gray-50 z-51 flex items-center justify-between border-b border-gray-200 w-full px-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold leading-tight">
-            <span className="text-slate-800">Quiz </span>
-            <span className="text-orange-400">Matter</span>
-          </h1>
+          <Image
+            src="/quizmatter-logo.png"
+            alt="School Logo"
+            width={120}
+            height={120}
+            className="object-contain"
+          />
         </div>
 
         {/* Center */}
@@ -464,36 +451,12 @@ export default function QuestionBuilder({ quiz }) {
             </div>
 
             {openMenuBelow && (
-              <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-44 bg-white border border-gray-200 rounded-md shadow-lg z-20 py-2">
-                <button
-                  onClick={() => {
-                    addQuestionAfter(null, "multiple");
-                    setOpenMenuBelow(false);
-                  }}
-                  className="w-full text-left px-3 py-1 text-md hover:bg-gray-100"
-                >
-                  Multiple Choice
-                </button>
-
-                <button
-                  onClick={() => {
-                    addQuestionAfter(null, "short");
-                    setOpenMenuBelow(false);
-                  }}
-                  className="w-full text-left px-3 py-1 text-md hover:bg-gray-100"
-                >
-                  Fill in the Blank
-                </button>
-
-                <button
-                  onClick={() => {
-                    addQuestionAfter(null, "textbox");
-                    setOpenMenuBelow(false);
-                  }}
-                  className="w-full text-left px-3 py-1 text-md hover:bg-gray-100"
-                >
-                  Text Box
-                </button>
+              <div className="absolute left-0 mt-2 w-full bg-white border border-gray-200 rounded-md shadow-lg z-20 py-2">
+                <QuizTypeOptions
+                  questionId={null}
+                  setOpenMenu={setOpenMenu}
+                  setOpenMenuBelow={setOpenMenuBelow}
+                />
               </div>
             )}
           </div>

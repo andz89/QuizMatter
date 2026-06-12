@@ -53,10 +53,12 @@ const QuestionHeader = ({
           </button>
 
           {openMenu === questionId && (
-            <QuizTypeOptions
-              questionId={questionId}
-              setOpenMenu={setOpenMenu}
-            />
+            <div className="absolute left-0 mt-[-125] w-44 bg-white border border-gray-200 rounded-md shadow-lg z-20 py-2">
+              <QuizTypeOptions
+                questionId={questionId}
+                setOpenMenu={setOpenMenu}
+              />
+            </div>
           )}
         </div>
 

@@ -3,6 +3,9 @@ import { HiMiniPencilSquare, HiOutlineXMark } from "react-icons/hi2";
 import Link from "next/link";
 import { HiEye, HiEyeSlash, HiOutlineTv } from "react-icons/hi2";
 import { BsArrowsAngleContract } from "react-icons/bs";
+
+import addQuestionNumbers from "@/src/app/utils/lib/addQuestionNumbers";
+
 const Presentation = ({ quiz, open, onClose }) => {
   const [showAnswers, setShowAnswers] = useState(false);
   const [visibleAnswers, setVisibleAnswers] = useState({});
@@ -50,6 +53,11 @@ const Presentation = ({ quiz, open, onClose }) => {
         prev[questionId] === undefined ? !showAnswers : !prev[questionId],
     }));
   };
+
+  // if you want to remove this, replace the itemsWithNumbers before map with questions.slice().sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+  const itemsWithNumbers = addQuestionNumbers(
+    quiz?.questions.slice().sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
+  );
   return (
     <div className="fixed inset-0 z-52 flex flex-col justify-center   bg-white">
       <div
@@ -164,18 +172,16 @@ const Presentation = ({ quiz, open, onClose }) => {
           {/* Example */}
 
           <div className=" text-left">
-            {quiz?.questions
-              ?.slice()
-              .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-              .map((question, index) => {
-                const isAnswerVisible =
-                  visibleAnswers[question.id] ?? showAnswers;
-                return (
-                  <div
-                    key={question.id}
-                    className="text-slate-800 mb-5 leading-tight border border-gray-400 p-4 rounded-2xl    border border-slate-200
+            {itemsWithNumbers?.map((question, index) => {
+              const isAnswerVisible =
+                visibleAnswers[question.id] ?? showAnswers;
+              return (
+                <div
+                  key={index}
+                  className="text-slate-800 mb-5 leading-tight border border-gray-400 p-4 rounded-2xl    border border-slate-200
         bg-slate-50  "
-                  >
+                >
+                  {question.questionNumber && (
                     <button
                       onClick={() => toggleQuestionAnswer(question.id)}
                       className="
@@ -195,67 +201,70 @@ const Presentation = ({ quiz, open, onClose }) => {
                         <HiEye size={18} />
                       )}
                     </button>
-                    {/* Question */}
-                    <h4
-                      style={{
-                        fontSize: `clamp(${1.2 * fontSize}rem, ${
-                          2 * fontSize
-                        }vw + 1rem, ${3 * fontSize}rem)`,
-                      }}
-                      className="  flex text-slate-800 mb-4 leading-tight min-h-[40px] p-2 focus:outline-none [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6"
-                    >
-                      {index + 1}.{" "}
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: question.question,
-                        }}
-                      />
-                    </h4>
-
-                    {/* Options */}
+                  )}
+                  {/* Question */}
+                  <h4
+                    style={{
+                      fontSize: `clamp(${1.2 * fontSize}rem, ${
+                        2 * fontSize
+                      }vw + 1rem, ${3 * fontSize}rem)`,
+                    }}
+                    className="  flex text-slate-800 mb-4 leading-tight min-h-[40px] p-2 focus:outline-none [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6"
+                  >
+                    {question.questionNumber
+                      ? question.questionNumber + ". "
+                      : " "}
                     <div
-                      className={`gap-2    ${
-                        question.layout === "row"
-                          ? "flex flex-row flex-wrap justify-around"
-                          : question.layout === "grid"
-                            ? "grid grid-cols-2 w-full"
-                            : "flex flex-col flex-base"
-                      }`}
-                    >
-                      {question.options
-                        ?.slice()
-                        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-                        .map((option, optionIndex) => (
+                      dangerouslySetInnerHTML={{
+                        __html: question.question,
+                      }}
+                    />
+                  </h4>
+
+                  {/* Options */}
+                  <div
+                    className={`gap-2    ${
+                      question.layout === "row"
+                        ? "flex flex-row flex-wrap justify-around"
+                        : question.layout === "grid"
+                          ? "grid grid-cols-2 w-full"
+                          : "flex flex-col flex-base"
+                    }`}
+                  >
+                    {question.options
+                      ?.slice()
+                      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                      .map((option, optionIndex) => (
+                        <div
+                          key={option.option_id}
+                          className={`flex px-4 py-2 text-slate-700 border border-slate-300 rounded-lg ${
+                            isAnswerVisible &&
+                            question.correct === option.option_id
+                              ? "bg-green-200"
+                              : "bg-white"
+                          }`}
+                          style={{
+                            fontSize: `clamp(${1 * fontSize}rem, ${
+                              1.5 * fontSize
+                            }vw + 1rem, ${2.5 * fontSize}rem)`,
+                          }}
+                        >
+                          {question.showLabel && (
+                            <span className="font-medium mr-2">
+                              {String.fromCharCode(65 + optionIndex)}.
+                            </span>
+                          )}
                           <div
-                            key={option.option_id}
-                            className={`flex px-4 py-2 text-slate-700 border border-slate-300 rounded-lg ${
-                              isAnswerVisible &&
-                              question.correct === option.option_id
-                                ? "bg-green-200"
-                                : "bg-white"
-                            }`}
-                            style={{
-                              fontSize: `clamp(${1 * fontSize}rem, ${
-                                1.5 * fontSize
-                              }vw + 1rem, ${2.5 * fontSize}rem)`,
+                            dangerouslySetInnerHTML={{
+                              __html: option.label,
                             }}
-                          >
-                            {question.showLabel && (
-                              <span className="font-medium mr-2">
-                                {String.fromCharCode(65 + optionIndex)}.
-                              </span>
-                            )}
-                            <div
-                              dangerouslySetInnerHTML={{
-                                __html: option.label,
-                              }}
-                            />
-                          </div>
-                        ))}
-                    </div>
+                          />
+                        </div>
+                      ))}
                   </div>
-                );
-              })}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
