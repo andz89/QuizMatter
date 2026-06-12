@@ -23,6 +23,12 @@ const QuizTypeOptions = ({ questionId, setOpenMenu }) => {
       >
         Fill in the Blank
       </button>
+      <button
+        onClick={() => handleAdd("textbox")}
+        className="w-full text-left px-3 py-1 text-md hover:bg-gray-100"
+      >
+        Text Box
+      </button>
     </div>
   );
 };

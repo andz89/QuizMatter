@@ -16,16 +16,11 @@ const QuestionHeader = ({
   setOpenMenu,
   isActive,
   activeRef,
-  index,
 }) => {
   const { removeQuestion, duplicateQuestion } = useQuizStore();
   const moveUp = useQuizStore((state) => state.moveQuestionUp);
   const moveDown = useQuizStore((state) => state.moveQuestionDown);
 
-  if (index < 0 || index >= questionLength) {
-    // optional: show error or ignore
-    return;
-  }
   return (
     <div
       ref={isActive ? activeRef : null}

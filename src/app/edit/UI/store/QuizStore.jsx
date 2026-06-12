@@ -280,7 +280,7 @@ export const useQuizStore = create((set) => ({
 
       let currentIndex =
         questionId === null
-          ? sorted.length - 1
+          ? sorted.length
           : sorted.findIndex((q) => q.question_id === questionId);
 
       if (currentIndex === -1 && questionId !== null) return state;
@@ -298,7 +298,8 @@ export const useQuizStore = create((set) => ({
         newOptions = [createOption(newQuestion.question_id, 0)];
       }
 
-      const insertIndex = currentIndex + 1;
+      const insertIndex =
+        questionId !== null ? currentIndex + 1 : sorted.length;
 
       sorted.splice(insertIndex, 0, newQuestion);
 

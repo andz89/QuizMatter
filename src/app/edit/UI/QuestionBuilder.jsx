@@ -6,6 +6,7 @@ import QuestionInput from "./QuestionInput";
 import LayoutOptions from "./LayoutOptions";
 import MultipleChoicesInput from "./MultipleChoicesInput";
 import FillTheBlankInput from "./FillTheBlankInput";
+
 import QuestionHeader from "./QuestionHeader";
 import { useQuizStore } from "./store/QuizStore";
 import { DndContext, closestCenter } from "@dnd-kit/core";
@@ -21,6 +22,24 @@ import { useSaveQuiz } from "./utils/useSaveQuiz";
 import EditQuizDetails from "./EditQuizDetails";
 import Presentation from "@/src/components/presentation/Presentation";
 import FloatingToolbar from "./editor/FloatingToolbar";
+const isQuestion = (type) => ["multiple", "short"].includes(type);
+
+function addQuestionNumbers(items) {
+  let questionNumber = 0;
+
+  return items.map((item) => {
+    if (isQuestion(item.type)) {
+      questionNumber++;
+
+      return {
+        ...item,
+        questionNumber,
+      };
+    }
+
+    return item;
+  });
+}
 function normalizeSingleQuiz(quiz) {
   const questions = [];
   const options = [];
@@ -154,7 +173,10 @@ export default function QuestionBuilder({ quiz }) {
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
     })),
   };
-
+  // if you want to remove this, replace the itemsWithNumbers before map with questions.slice().sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+  const itemsWithNumbers = addQuestionNumbers(
+    questions.slice().sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
+  );
   return (
     <div className="bg-white min-h-screen mb-40">
       {/* quiz header */}
@@ -235,179 +257,176 @@ export default function QuestionBuilder({ quiz }) {
           />
           {/* Questions details end */}
 
-          {questions
-            .slice()
-            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-            .map((q, index) => {
-              return (
-                <div key={q.question_id} className="  ">
-                  <div className="flex items-center justify-end gap-3  w-full mt-7 mb-1">
-                    <QuestionHeader
-                      questionLength={questions.length}
-                      questionId={q.question_id}
-                      setOpenMenu={setOpenMenu}
-                      openMenu={openMenu}
-                      isActive={openMenu === q.question_id}
-                      activeRef={activeRef}
-                      index={q.order}
-                    />
-                  </div>
-                  <div className="flex flex-col gap-4 p-2 border border-gray-200 rounded w-full">
-                    {/* Question */}
-
-                    <QuestionInput
-                      id={q.question_id}
-                      index={index}
-                      setActiveEditor={setActiveEditor}
-                    />
-                    {/* Layout */}
-                    {q.type !== "short" && (
-                      <div className=" flex justify-between">
-                        <LayoutOptions
-                          id={q.question_id}
-                          layoutData={q.layout}
-                        />
-                      </div>
-                    )}
-
-                    {/* Fill in the blank */}
-                    {q.type === "short" && (
-                      <FillTheBlankInput
-                        question_id={q.question_id}
+          {itemsWithNumbers.map((q, index) => {
+            return (
+              <div key={q.question_id} className="  ">
+                <div className="flex items-center justify-end gap-3  w-full mt-4 mb-1">
+                  <QuestionHeader
+                    questionLength={questions.length}
+                    questionId={q.question_id}
+                    setOpenMenu={setOpenMenu}
+                    openMenu={openMenu}
+                    isActive={openMenu === q.question_id}
+                    activeRef={activeRef}
+                  />
+                </div>
+                <div className="flex flex-col gap-4 p-2 border border-gray-200 rounded w-full">
+                  {/* Question */}
+                  {/* {q.type !== "para" && ( */}
+                  <QuestionInput
+                    id={q.question_id}
+                    index={q.questionNumber}
+                    setActiveEditor={setActiveEditor}
+                  />
+                  {/* )} */}
+                  {/* {q.type === "para" && (
+                      <QuestionInput
+                        id={q.question_id}
                         setActiveEditor={setActiveEditor}
                       />
-                    )}
-                    {/* Multiple Choice */}
-                    {q.type !== "short" && (
-                      <div
-                        className={`gap-2    ${
-                          q.layout === "row"
-                            ? "flex flex-row flex-wrap  min-w-10"
-                            : q.layout === "grid"
-                              ? "grid grid-cols-2 w-full"
-                              : "flex flex-col flex-base"
-                        }`}
-                      >
-                        {q.type !== "short" &&
-                          (() => {
-                            // ✅ always sort before render
-                            const questionOptions = options
-                              .filter(
-                                (opt) => opt.question_id === q.question_id,
-                              )
-                              .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+                    )} */}
+                  {/* Layout */}
+                  {q.type === "multiple" && (
+                    <div className=" flex justify-between">
+                      <LayoutOptions id={q.question_id} layoutData={q.layout} />
+                    </div>
+                  )}
 
-                            return (
-                              <DndContext
-                                collisionDetection={closestCenter}
-                                onDragEnd={(event) => {
-                                  const { active, over } = event;
+                  {/* Fill in the blank */}
+                  {q.type === "short" && (
+                    <FillTheBlankInput
+                      question_id={q.question_id}
+                      setActiveEditor={setActiveEditor}
+                    />
+                  )}
 
-                                  if (!over || active.id === over.id) return;
+                  {/* Multiple Choice */}
+                  {q.type === "multiple" && (
+                    <div
+                      className={`gap-2    ${
+                        q.layout === "row"
+                          ? "flex flex-row flex-wrap  min-w-10"
+                          : q.layout === "grid"
+                            ? "grid grid-cols-2 w-full"
+                            : "flex flex-col flex-base"
+                      }`}
+                    >
+                      {q.type === "multiple" &&
+                        (() => {
+                          // ✅ always sort before render
+                          const questionOptions = options
+                            .filter((opt) => opt.question_id === q.question_id)
+                            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-                                  const oldIndex = questionOptions.findIndex(
-                                    (o) => o.option_id === active.id,
-                                  );
+                          return (
+                            <DndContext
+                              collisionDetection={closestCenter}
+                              onDragEnd={(event) => {
+                                const { active, over } = event;
 
-                                  const newIndex = questionOptions.findIndex(
-                                    (o) => o.option_id === over.id,
-                                  );
+                                if (!over || active.id === over.id) return;
 
-                                  const newItems = arrayMove(
-                                    questionOptions,
-                                    oldIndex,
-                                    newIndex,
-                                  );
+                                const oldIndex = questionOptions.findIndex(
+                                  (o) => o.option_id === active.id,
+                                );
 
-                                  // ✅ build fast lookup map
-                                  const orderMap = new Map(
-                                    newItems.map((item, index) => [
-                                      item.option_id,
-                                      index,
-                                    ]),
-                                  );
+                                const newIndex = questionOptions.findIndex(
+                                  (o) => o.option_id === over.id,
+                                );
 
-                                  // ✅ update ONLY this question’s options
-                                  useQuizStore.setState((state) => ({
-                                    options: state.options.map((opt) => {
-                                      if (opt.question_id !== q.question_id)
-                                        return opt;
+                                const newItems = arrayMove(
+                                  questionOptions,
+                                  oldIndex,
+                                  newIndex,
+                                );
 
-                                      const newOrder = orderMap.get(
-                                        opt.option_id,
-                                      );
+                                // ✅ build fast lookup map
+                                const orderMap = new Map(
+                                  newItems.map((item, index) => [
+                                    item.option_id,
+                                    index,
+                                  ]),
+                                );
 
-                                      // optional: avoid unnecessary updates
-                                      if (
-                                        newOrder === undefined ||
-                                        newOrder === opt.order
-                                      )
-                                        return opt;
+                                // ✅ update ONLY this question’s options
+                                useQuizStore.setState((state) => ({
+                                  options: state.options.map((opt) => {
+                                    if (opt.question_id !== q.question_id)
+                                      return opt;
 
-                                      return {
-                                        ...opt,
-                                        order: newOrder,
-                                        isDirty: true,
-                                        dirtyFields: {
-                                          ...(opt.dirtyFields || {}),
-                                          order: true, // ✅ correct
-                                        },
-                                      };
-                                    }),
-                                  }));
-                                }}
+                                    const newOrder = orderMap.get(
+                                      opt.option_id,
+                                    );
+
+                                    // optional: avoid unnecessary updates
+                                    if (
+                                      newOrder === undefined ||
+                                      newOrder === opt.order
+                                    )
+                                      return opt;
+
+                                    return {
+                                      ...opt,
+                                      order: newOrder,
+                                      isDirty: true,
+                                      dirtyFields: {
+                                        ...(opt.dirtyFields || {}),
+                                        order: true, // ✅ correct
+                                      },
+                                    };
+                                  }),
+                                }));
+                              }}
+                            >
+                              <SortableContext
+                                items={questionOptions.map((o) => o.option_id)}
+                                strategy={verticalListSortingStrategy}
                               >
-                                <SortableContext
-                                  items={questionOptions.map(
-                                    (o) => o.option_id,
-                                  )}
-                                  strategy={verticalListSortingStrategy}
-                                >
-                                  {questionOptions.map((opt, index) => (
-                                    <MultipleChoicesInput
-                                      setDeleteOptionId={setDeleteOptionId}
-                                      showLabel={q.showLabel}
-                                      key={opt.option_id}
-                                      opt={opt}
-                                      index={index}
-                                      deleteOptionId={deleteOptionId}
-                                      setActiveEditor={setActiveEditor}
-                                      questionOptionsLength={
-                                        questionOptions.length
-                                      }
-                                    />
-                                  ))}
-                                </SortableContext>
-                              </DndContext>
-                            );
-                          })()}
+                                {questionOptions.map((opt, index) => (
+                                  <MultipleChoicesInput
+                                    setDeleteOptionId={setDeleteOptionId}
+                                    showLabel={q.showLabel}
+                                    key={opt.option_id}
+                                    opt={opt}
+                                    index={index}
+                                    deleteOptionId={deleteOptionId}
+                                    setActiveEditor={setActiveEditor}
+                                    questionOptionsLength={
+                                      questionOptions.length
+                                    }
+                                  />
+                                ))}
+                              </SortableContext>
+                            </DndContext>
+                          );
+                        })()}
 
-                        {/* Footer */}
-                      </div>
-                    )}
+                      {/* Footer */}
+                    </div>
+                  )}
 
-                    {q.type !== "short" && (
-                      <div className="flex items-center justify-start gap-2 w-full">
-                        <div className="flex items-center justify-between gap-2 w-[70px]">
-                          <label className="text-sm font-medium text-gray-700">
-                            Label
-                          </label>
+                  {q.type === "multiple" && (
+                    <div className="flex items-center justify-start gap-2 w-full">
+                      <div className="flex items-center justify-between gap-2 w-[70px]">
+                        <label className="text-sm font-medium text-gray-700">
+                          Label
+                        </label>
 
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={q.showLabel ?? true}
-                              onChange={(e) =>
-                                updateQuestionLabelVisibility(
-                                  q.question_id,
-                                  e.target.checked,
-                                )
-                              }
-                              className="sr-only peer"
-                            />
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={q.showLabel ?? true}
+                            onChange={(e) =>
+                              updateQuestionLabelVisibility(
+                                q.question_id,
+                                e.target.checked,
+                              )
+                            }
+                            className="sr-only peer"
+                          />
 
-                            <div
-                              className="w-[30px] h-[14px] bg-gray-300 rounded-full relative
+                          <div
+                            className="w-[30px] h-[14px] bg-gray-300 rounded-full relative
   transition-colors duration-300
   peer-checked:bg-orange-500
 
@@ -420,22 +439,22 @@ export default function QuestionBuilder({ quiz }) {
   peer-checked:after:border-orange-500
   peer-checked:shadow-sm
 "
-                            ></div>
-                          </label>
-                        </div>
-
-                        <button
-                          onClick={() => addOption(q.question_id)}
-                          className="ml-2 px-2 py-1 text-sm text-gray-600 bg-gray-200 rounded hover:bg-gray-300 transition w-32"
-                        >
-                          + Add Option
-                        </button>
+                          ></div>
+                        </label>
                       </div>
-                    )}
-                  </div>
+
+                      <button
+                        onClick={() => addOption(q.question_id)}
+                        className="ml-2 px-2 py-1 text-sm text-gray-600 bg-gray-200 rounded hover:bg-gray-300 transition w-32"
+                      >
+                        + Add Option
+                      </button>
+                    </div>
+                  )}
                 </div>
-              );
-            })}
+              </div>
+            );
+          })}
           <div ref={belowMenuRef} className="mt-5 w-full relative">
             <div
               onClick={() => setOpenMenuBelow((prev) => !prev)}
@@ -464,6 +483,16 @@ export default function QuestionBuilder({ quiz }) {
                   className="w-full text-left px-3 py-1 text-md hover:bg-gray-100"
                 >
                   Fill in the Blank
+                </button>
+
+                <button
+                  onClick={() => {
+                    addQuestionAfter(null, "textbox");
+                    setOpenMenuBelow(false);
+                  }}
+                  className="w-full text-left px-3 py-1 text-md hover:bg-gray-100"
+                >
+                  Text Box
                 </button>
               </div>
             )}

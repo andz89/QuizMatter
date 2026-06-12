@@ -87,7 +87,7 @@ export default function TinyQuestionEditor({
             select-none
           "
         >
-          {index + 1}.
+          {index ? index + "." : ""}
         </span>
       )}
       <div className="w-full">
