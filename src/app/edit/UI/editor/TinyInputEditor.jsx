@@ -1,4 +1,5 @@
 "use client";
+import React, { useEffect, useState } from "react";
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -7,24 +8,18 @@ import Highlight from "@tiptap/extension-highlight";
 import Superscript from "@tiptap/extension-superscript";
 import Subscript from "@tiptap/extension-subscript";
 import Strike from "@tiptap/extension-strike";
-import { useEffect, useState } from "react";
 
 import { HiBold, HiItalic, HiUnderline, HiListBullet } from "react-icons/hi2";
 
-export default function TinyQuestionEditor({
-  optionDetails,
+function TinyQuestionEditor({
   value = "",
   onChange,
   index,
   setActiveEditor,
   inputFrom,
-  setDeleteOptionId,
+  onFocus,
+  onBlur,
 }) {
-  let data = {
-    option_id: optionDetails?.option_id,
-    question_id: optionDetails?.question_id,
-  };
-
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -56,10 +51,10 @@ export default function TinyQuestionEditor({
     },
     onFocus: ({ editor }) => {
       setActiveEditor?.(editor);
-      setDeleteOptionId?.(data);
+      onFocus?.();
     },
     onBlur: () => {
-      setDeleteOptionId?.({});
+      onBlur?.();
     },
     onUpdate: ({ editor }) => {
       onChange?.(editor.getHTML());
@@ -96,3 +91,4 @@ export default function TinyQuestionEditor({
     </div>
   );
 }
+export default React.memo(TinyQuestionEditor);

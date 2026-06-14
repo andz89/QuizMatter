@@ -24,51 +24,31 @@ const QuestionHeader = ({
   return (
     <div
       ref={isActive ? activeRef : null}
-      className="flex w-full items-center justify-end gap-2"
+      className="flex w-full items-center justify-end gap-2 bg-white border  border-gray-200 p-2  rounded-lg"
     >
-      <div className="flex gap-2">
-        <div className="flex gap-2">
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-col ">
           <button
-            className="hover:cursor-pointer flex items-center justify-center w-7 h-7 rounded-md border border-gray-300 bg-white hover:bg-gray-100 hover:border-gray-400 transition"
+            className="hover:cursor-pointer flex items-center justify-center w-8 h-8 rounded-md  bg-white hover:bg-gray-100 hover:border-gray-400 transition"
             onClick={() => moveUp(questionId)}
           >
-            <BiChevronUp size={28} />
+            <BiChevronUp size={45} className="text-gray-700" />
           </button>
           <button
-            className="hover:cursor-pointer flex items-center justify-center w-7 h-7 rounded-md border border-gray-300 bg-white hover:bg-gray-100 hover:border-gray-400 transition"
+            className="hover:cursor-pointer flex items-center justify-center w-8 h-8 rounded-md  bg-white hover:bg-gray-100 hover:border-gray-300 transition"
             onClick={() => moveDown(questionId)}
           >
-            <BiChevronDown size={28} />
+            <BiChevronDown size={45} className="text-gray-700" />
           </button>
-        </div>
-        {/* Add */}
-        <div className="relative">
-          <button
-            onClick={() =>
-              setOpenMenu(openMenu === questionId ? null : questionId)
-            }
-            className="hover:cursor-pointer flex items-center justify-center w-7 h-7 rounded-md border border-gray-300 bg-white hover:bg-gray-100 hover:border-gray-400 transition"
-          >
-            <BiPlus size={16} className="text-gray-700" />
-          </button>
-
-          {openMenu === questionId && (
-            <div className="absolute left-0 mt-[-125] w-44 bg-white border border-gray-200 rounded-md shadow-lg z-20 py-2">
-              <QuizTypeOptions
-                questionId={questionId}
-                setOpenMenu={setOpenMenu}
-              />
-            </div>
-          )}
         </div>
 
         {/* Duplicate */}
         <button
           onClick={() => duplicateQuestion(questionId)}
-          className="hover:cursor-pointer flex items-center justify-center w-7 h-7 rounded-md border border-gray-300 bg-white hover:bg-blue-50 hover:border-blue-400 transition"
+          className="hover:cursor-pointer flex items-center justify-center w-8 h-8 rounded  bg-white hover:bg-blue-50 hover:border-blue-400 transition"
         >
           <BiDuplicate
-            size={16}
+            size={21}
             className="text-gray-700 hover:text-blue-600"
           />
         </button>
@@ -80,15 +60,15 @@ const QuestionHeader = ({
           onClick={() => removeQuestion(questionId)}
           className={`${
             questionLength <= 1
-              ? "cursor-not-allowed   flex items-center justify-center w-7 h-7 rounded-md border border-gray-300 bg-gray-100   transition"
-              : "hover:cursor-pointer flex items-center justify-center w-7 h-7 rounded-md border border-gray-300 bg-white hover:bg-red-50 hover:border-red-400 transition"
+              ? "cursor-not-allowed   flex items-center justify-center w-8 h-8 rounded  bg-gray-100   transition"
+              : "hover:cursor-pointer flex items-center justify-center w-8 h-8 rounded  bg-white hover:bg-red-50 hover:border-red-400 transition"
           }`}
         >
           <BiSolidTrash
-            size={16}
+            size={21}
             className={`${
               questionLength <= 1
-                ? "text-gray-400"
+                ? "text-gray-700"
                 : "text-gray-700 hover:text-red-400"
             }`}
           />

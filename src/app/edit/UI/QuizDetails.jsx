@@ -13,7 +13,7 @@ const QuizDetails = ({ quiz, setOpenEdit }) => {
           w-full max-w-3xl
           max-h-[90vh] overflow-y-auto
           bg-white
-          rounded-3xl
+          rounded-lg
           border border-slate-200
           shadow-sm
           relative

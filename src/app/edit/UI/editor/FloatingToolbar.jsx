@@ -1,9 +1,12 @@
 "use client";
 
 import { HiBold, HiItalic, HiUnderline, HiListBullet } from "react-icons/hi2";
-
+import { useState } from "react";
+import EmojiPicker from "emoji-picker-react";
 export default function FloatingToolbar({ editor }) {
   //   if (!editor) return null;
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
   const disabled = !editor;
 
   const buttonClass = (active) =>
@@ -35,6 +38,38 @@ export default function FloatingToolbar({ editor }) {
         shadow-sm
       "
     >
+      <div className="relative">
+        <button
+          type="button"
+          disabled={disabled}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => setShowEmojiPicker((prev) => !prev)}
+          className={buttonClass(false)}
+        >
+          😀
+        </button>
+
+        {showEmojiPicker && (
+          <div className="absolute top-10 left-0 z-50">
+            <EmojiPicker
+              width={400}
+              height={500}
+              onEmojiClick={(emojiData) => {
+                editor
+                  ?.chain()
+                  .focus()
+                  .insertContent(
+                    `<span style="font-size:32px">${emojiData.emoji}</span>`,
+                  )
+                  .run();
+
+                setShowEmojiPicker(false);
+              }}
+            />
+          </div>
+        )}
+      </div>
+
       <button
         disabled={disabled}
         type="button"
