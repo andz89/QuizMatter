@@ -77,7 +77,6 @@ export default function QuestionBuilder({ quiz }) {
   // }, []);
 
   const activeRef = useRef(null); // to detect click outside of question menu and close the menu when click outside
-  const belowMenuRef = useRef(null); // to detect click outside of below question menu and close the menu when click outside
 
   useEffect(() => {
     // click outside to close menu
@@ -86,20 +85,31 @@ export default function QuestionBuilder({ quiz }) {
       if (activeRef.current && !activeRef.current.contains(event.target)) {
         setOpenMenu(null);
       }
-
-      // ✅ NEW: below menu
-      if (
-        belowMenuRef.current &&
-        !belowMenuRef.current.contains(event.target)
-      ) {
-        setOpenMenuBelow(false);
-      }
     };
 
     document.addEventListener("click", handleClickOutside);
 
     return () => {
       document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
+  const activeQuestionRef = useRef(null);
+
+  const [activeQuestion, setActiveQuestion] = useState(null);
+  useEffect(() => {
+    // click outside to close menu
+    const handleHoverQuestion = (event) => {
+      // existing menu
+      if (!activeQuestionRef.current) {
+        setActiveQuestion(null);
+      }
+    };
+
+    document.addEventListener("hover", handleHoverQuestion);
+
+    return () => {
+      document.removeEventListener("hover", handleHoverQuestion);
     };
   }, []);
   useEffect(() => {
@@ -219,7 +229,7 @@ export default function QuestionBuilder({ quiz }) {
       </div>
       {/* quiz header end */}
 
-      <div className="max-w-[720px] mx-auto    ">
+      <div className="max-w-[720px] mx-auto   p-2 ">
         <div className="flex flex-col pt-20">
           {/* Quiz Details */}
           <QuizDetails setOpenEdit={setOpenEdit} quiz={quizDetails} />
@@ -233,8 +243,11 @@ export default function QuestionBuilder({ quiz }) {
 
           {itemsWithNumbers.map((q, index) => {
             return (
-              <div key={q.question_id}>
-                <div className="flex gap-2 w-full justify-center my-4">
+              <div
+                onClick={() => setActiveQuestion(q.question_id)}
+                key={q.question_id}
+              >
+                <div className="flex   w-full justify-center my-4">
                   <div className="flex flex-col gap-4 p-2 border border-gray-200 rounded-lg w-full min-h-[200px]">
                     {/* Question */}
                     {/* {q.type !== "para" && ( */}
@@ -337,19 +350,20 @@ export default function QuestionBuilder({ quiz }) {
 
                             <div
                               className="w-[30px] h-[14px] bg-gray-300 rounded-full relative
-  transition-colors duration-300
-  peer-checked:bg-orange-500
+                            transition-colors duration-300
+                            peer-checked:bg-orange-500
+                            after:content-[''] after:absolute after:top-[1px] after:left-[1px]
+                            after:bg-white after:border after:border-gray-300
+                            after:rounded-full after:h-3 after:w-3
+                            after:transition-all after:duration-300
 
-  after:content-[''] after:absolute after:top-[1px] after:left-[1px]
-  after:bg-white after:border after:border-gray-300
-  after:rounded-full after:h-3 after:w-3
-  after:transition-all after:duration-300
-
-  peer-checked:after:translate-x-[16px]
-  peer-checked:after:border-orange-500
-  peer-checked:shadow-sm
+                            peer-checked:after:translate-x-[16px]
+                            peer-checked:after:border-orange-500
+                            peer-checked:shadow-sm
 "
-                            ></div>
+                            >
+                              {" "}
+                            </div>
                           </label>
                         </div>
 
@@ -362,47 +376,47 @@ export default function QuestionBuilder({ quiz }) {
                       </div>
                     )}
                   </div>
-
-                  <div className="flex items-center justify-end gap-3  ">
-                    <QuestionHeader
-                      questionLength={questions.length}
-                      questionId={q.question_id}
-                      setOpenMenu={setOpenMenu}
-                      openMenu={openMenu}
-                      isActive={openMenu === q.question_id}
-                      activeRef={activeRef}
-                    />
+                  <div
+                    className={`
+                          relative flex items-center justify-end gap-3
+                          transition-all duration-300 ease-out
+                          ${
+                            activeQuestion === q.question_id
+                              ? "opacity-100  "
+                              : "opacity-0   pointer-events-none"
+                          }
+                          `}
+                  >
+                    <div className="absolute left-[5px]">
+                      <QuestionHeader
+                        questionLength={questions.length}
+                        questionId={q.question_id}
+                      />
+                    </div>
                   </div>
                 </div>
 
-                {/* <div ref={belowMenuRef} className="mt-5 w-full relative">
-                  <div
-                    onClick={() => setOpenMenuBelow((prev) => !prev)}
-                    className="user-select-none w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded cursor-pointer transition"
-                  >
-                    Add Question Below
-                  </div>
-
-                  {openMenuBelow && (
-                    <div className="absolute left-0 mt-2 w-full bg-white border border-gray-200 rounded-md shadow-lg z-20 py-2">
-                      <QuizTypeOptions
-                        questionId={q.question_id}
-                        setOpenMenu={setOpenMenu}
-                        setOpenMenuBelow={setOpenMenuBelow}
-                      />
-                    </div>
-                  )}
-                </div> */}
                 <div className="mt-5 w-full relative mx-auto">
                   <QuizTypeOptions
                     questionId={q.question_id}
                     setOpenMenu={setOpenMenu}
-                    setOpenMenuBelow={setOpenMenuBelow}
+                    isActive={openMenu === q.question_id}
+                    activeRef={activeRef}
                   />
                 </div>
               </div>
             );
           })}
+          {itemsWithNumbers.length < 1 && (
+            <div className="mt-5 w-full relative mx-auto">
+              <QuizTypeOptions
+                questionId={null}
+                setOpenMenu={setOpenMenu}
+                isActive={openMenu === "empty"}
+                activeRef={activeRef}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

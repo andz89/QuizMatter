@@ -8,37 +8,61 @@ import { BiPlus } from "react-icons/bi";
 const QuizTypeOptions = ({
   questionId,
   setOpenMenu,
-  setOpenMenuBelow = () => {},
+
+  isActive,
+  activeRef,
 }) => {
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
   const { addQuestionAfter } = useQuizStore();
   const handleAdd = (type) => {
     addQuestionAfter(questionId, type);
-    setOpen(false);
+
     setOpenMenu(null);
-    setOpenMenuBelow(false);
   };
 
   return (
-    <div className="relative  ">
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center  px-3  py-2 border rounded-lg border-slate-300  bg-white hover:bg-gray-50 text-gray-700 cursor-pointer   "
-      >
-        <BiPlus size={20} />
-        {/* <HiChevronDown
-          className={`transition-transform duration-200 ${
-            open ? "rotate-180" : ""
-          }`}
-        /> */}
-      </button>
+    <div ref={isActive ? activeRef : null} className="group relative py-5">
+      <div className="relative  w-full">
+        <div className="h-px border-t border-dashed border-slate-300" />
 
-      {open && (
+        <button
+          onClick={() =>
+            setOpenMenu((prev) =>
+              prev === (questionId ?? "empty") ? null : (questionId ?? "empty"),
+            )
+          }
+          className="
+      absolute left-1/2 top-1/2
+      -translate-x-1/2 -translate-y-1/2
+
+      w-10 h-10
+      rounded-full
+      bg-white
+      border border-slate-300
+      shadow-sm
+  z-10
+      flex items-center justify-center
+
+      hover:shadow-md
+      hover:scale-105
+      hover:bg-slate-50
+  opacity-30
+  group-hover:opacity-100
+
+  transition-all duration-200
+      transition-all duration-200
+    
+
+ 
+    "
+        >
+          <BiPlus size={22} />
+        </button>
+
         <div
-          className={`absolute left-0 mt-2 w-56 bg-white border border-slate-300 rounded shadow-lg z-50
-    origin-top-left text-gray-700
-    transition-all duration-200 ease-out
-    ${open ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}
+          className={`absolute left-1/2 -translate-x-1/2 -translate-y-45   mt-2  w-56 bg-white border border-slate-300 rounded shadow-lg z-50  
+    text-gray-700 transition duration-300 ease-in-out
+${isActive ? "opacity-100  " : "opacity-0   - pointer-events-none"}
   `}
         >
           <button
@@ -65,7 +89,7 @@ const QuizTypeOptions = ({
             Text Box
           </button>
         </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -9,21 +9,14 @@ import {
   BiChevronUp,
 } from "react-icons/bi";
 
-const QuestionHeader = ({
-  questionLength,
-  questionId,
-  openMenu,
-  setOpenMenu,
-  isActive,
-  activeRef,
-}) => {
+const QuestionHeader = ({ questionLength, questionId }) => {
   const { removeQuestion, duplicateQuestion } = useQuizStore();
   const moveUp = useQuizStore((state) => state.moveQuestionUp);
   const moveDown = useQuizStore((state) => state.moveQuestionDown);
 
   return (
     <div
-      ref={isActive ? activeRef : null}
+      // ref={isActive ? activeRef : null}
       className="flex w-full items-center justify-end gap-2 bg-white border  border-gray-200 p-2  rounded-lg"
     >
       <div className="flex flex-col gap-2">
