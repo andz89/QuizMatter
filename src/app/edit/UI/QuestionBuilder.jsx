@@ -12,7 +12,7 @@ import QuestionHeader from "./QuestionHeader";
 import { useQuizStore } from "./store/QuizStore";
 import toast from "react-hot-toast";
 import DragOptions from "./DragOptions";
-
+import Textbox from "./TextBox";
 import { BsArrowsAngleExpand } from "react-icons/bs";
 import PublishSettingsModal from "../../../components/modal/PublishSettingsModal";
 import { useSaveQuiz } from "./utils/useSaveQuiz";
@@ -247,16 +247,33 @@ export default function QuestionBuilder({ quiz }) {
                 onClick={() => setActiveQuestion(q.question_id)}
                 key={q.question_id}
               >
-                <div className="flex   w-full justify-center my-4">
+                <div
+                  className={`
+                         flex   w-full justify-center my-4   rounded-lg
+                          transition-all duration-300 ease-out
+                          ${
+                            activeQuestion === q.question_id
+                              ? "border-l-3  border-orange-500  "
+                              : "border-l-3  border-gray-200 "
+                          }
+                          `}
+                >
                   <div className="flex flex-col gap-4 p-2 border border-gray-200 rounded-lg w-full min-h-[200px]">
                     {/* Question */}
-                    {/* {q.type !== "para" && ( */}
-                    <QuestionInput
-                      id={q.question_id}
-                      index={q.questionNumber}
-                      setActiveEditor={setActiveEditor}
-                    />
-                    {/* )} */}
+
+                    {["multiple", "short"].includes(q.type) && (
+                      <QuestionInput
+                        id={q.question_id}
+                        index={q.questionNumber}
+                        setActiveEditor={setActiveEditor}
+                      />
+                    )}
+                    {q.type === "textbox" && (
+                      <Textbox
+                        id={q.question_id}
+                        setActiveEditor={setActiveEditor}
+                      />
+                    )}
                     {/* {q.type === "para" && (
                       <QuestionInput
                         id={q.question_id}

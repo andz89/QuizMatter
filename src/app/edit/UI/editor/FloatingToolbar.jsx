@@ -55,13 +55,7 @@ export default function FloatingToolbar({ editor }) {
               width={400}
               height={500}
               onEmojiClick={(emojiData) => {
-                editor
-                  ?.chain()
-                  .focus()
-                  .insertContent(
-                    `<span style="font-size:32px">${emojiData.emoji}</span>`,
-                  )
-                  .run();
+                editor?.chain().focus().insertContent(emojiData.emoji).run();
 
                 setShowEmojiPicker(false);
               }}

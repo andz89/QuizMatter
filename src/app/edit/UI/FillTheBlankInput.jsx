@@ -17,12 +17,13 @@ const FillTheBlankInput = ({ question_id, setActiveEditor }) => {
   return (
     <div className="flex flex-col gap-1">
       <span className="text-sm text-gray-600">Correct Answer</span>
-
-      <TinyInputEditor
-        value={question?.correct || ""}
-        onChange={handleOptionChange}
-        setActiveEditor={setActiveEditor}
-      />
+      <div className="bg-gray-50 border-b  border-gray-300 p-2   w-full ">
+        <TinyInputEditor
+          value={question?.correct || ""}
+          onChange={handleOptionChange}
+          setActiveEditor={setActiveEditor}
+        />
+      </div>
     </div>
   );
 };

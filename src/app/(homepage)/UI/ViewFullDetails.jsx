@@ -198,20 +198,47 @@ const ViewFullDetails = ({ quiz, open, onClose, setMode }) => {
         bg-slate-50 
       "
               >
-                {/* Question */}
-                <h4 className=" flex  font-semibold text-slate-800 mb-4 min-h-[40px] p-2 focus:outline-none [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6">
-                  <span className="mr-1">
-                    {" "}
-                    {question.questionNumber
-                      ? question.questionNumber + ". "
-                      : " "}{" "}
-                  </span>
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: question.question,
-                    }}
-                  />
-                </h4>
+                {question.type === "textbox" && (
+                  <div className="p-2 w-full bg-white">
+                    {/* Title */}
+                    <h2
+                      className="text-2xl text-slate-800 font-600 leading-tight tracking-tight border-b border-gray-300"
+                      dangerouslySetInnerHTML={{
+                        __html: question.title,
+                      }}
+                    />
+
+                    {/* Description */}
+                    {question.description && (
+                      <div
+                        className="text-md bg-white w-full
+          mt-4
+          text-slate-600
+          leading-relaxed
+        
+          [&_ul]:list-disc
+          [&_ul]:ml-6
+          [&_ol]:list-decimal
+          [&_ol]:ml-6
+        "
+                        dangerouslySetInnerHTML={{
+                          __html: question.description,
+                        }}
+                      />
+                    )}
+                  </div>
+                )}
+
+                {["multiple", "short"].includes(question.type) && (
+                  <h4 className=" flex  font-semibold text-slate-800 mb-4 min-h-[40px] p-2 focus:outline-none [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6">
+                    <span className="mr-1"> {question.questionNumber}.</span>
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: question.question,
+                      }}
+                    />
+                  </h4>
+                )}
 
                 {/* Options */}
                 <div

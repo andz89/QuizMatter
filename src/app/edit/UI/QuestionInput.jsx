@@ -33,7 +33,7 @@ const QuestionInput = ({ id, index, setActiveEditor }) => {
   if (!question) return null;
 
   return (
-    <div className="bg-gray-50 border border-gray-300 p-2 rounded-lg w-full  ">
+    <div className="bg-gray-50 border-b   border-gray-300 p-2   w-full  ">
       <TinyInputEditor
         value={localValue}
         onChange={setLocalValue}

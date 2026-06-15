@@ -178,7 +178,7 @@ const Presentation = ({ quiz, open, onClose }) => {
               return (
                 <div
                   key={index}
-                  className="text-slate-800 mb-5 leading-tight border border-gray-400 p-4 rounded-2xl    border border-slate-200
+                  className="text-slate-800 mb-5 leading-tight border border-gray-400 p-2 rounded-lg   border border-slate-200
         bg-slate-50  "
                 >
                   {question.questionNumber && (
@@ -203,23 +203,65 @@ const Presentation = ({ quiz, open, onClose }) => {
                     </button>
                   )}
                   {/* Question */}
-                  <h4
-                    style={{
-                      fontSize: `clamp(${1.2 * fontSize}rem, ${
-                        2 * fontSize
-                      }vw + 1rem, ${3 * fontSize}rem)`,
-                    }}
-                    className="  flex text-slate-800 mb-4 leading-tight min-h-[40px] p-2 focus:outline-none [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6"
-                  >
-                    {question.questionNumber
-                      ? question.questionNumber + ". "
-                      : " "}
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: question.question,
+                  {["multiple", "short"].includes(question.type) && (
+                    <h4
+                      style={{
+                        fontSize: `clamp(${1.2 * fontSize}rem, ${
+                          2 * fontSize
+                        }vw + 1rem, ${3 * fontSize}rem)`,
                       }}
-                    />
-                  </h4>
+                      className="  flex text-slate-800 mb-4 leading-tight min-h-[40px] p-2 focus:outline-none [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6"
+                    >
+                      {question.questionNumber
+                        ? question.questionNumber + ". "
+                        : " "}
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: question.question,
+                        }}
+                      />
+                    </h4>
+                  )}
+                  {question.type === "textbox" && (
+                    <div className="p-2 w-full bg-white">
+                      {/* Title */}
+                      <h2
+                        style={{
+                          fontSize: `clamp(${4.5 * fontSize}rem, ${
+                            4.5 * fontSize
+                          }vw + 1rem, ${4.5 * fontSize}rem)`,
+                        }}
+                        className="text-slate-800 font-600 leading-tight tracking-tight border-b border-gray-300"
+                        dangerouslySetInnerHTML={{
+                          __html: question.title,
+                        }}
+                      />
+
+                      {/* Description */}
+                      {question.description && (
+                        <div
+                          style={{
+                            fontSize: `clamp(${1.4 * fontSize}rem, ${
+                              1.4 * fontSize
+                            }vw + 0.5rem, ${1.8 * fontSize}rem)`,
+                          }}
+                          className="bg-white w-full
+          mt-4
+          text-slate-600
+          leading-relaxed
+        
+          [&_ul]:list-disc
+          [&_ul]:ml-6
+          [&_ol]:list-decimal
+          [&_ol]:ml-6
+        "
+                          dangerouslySetInnerHTML={{
+                            __html: question.description,
+                          }}
+                        />
+                      )}
+                    </div>
+                  )}
 
                   {/* Options */}
                   <div

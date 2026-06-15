@@ -48,6 +48,7 @@ function TinyQuestionEditor({
         class:
           "min-w-10   min-h-[10px] focus:outline-none text-slate-700 leading-relaxed [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_mark]:bg-yellow-200 [&_mark]:px-1 [&_mark]:rounded",
       },
+      placeholder: "Title",
     },
     onFocus: ({ editor }) => {
       setActiveEditor?.(editor);
@@ -85,7 +86,7 @@ function TinyQuestionEditor({
           {index ? index + "." : ""}
         </span>
       )}
-      <div className="w-full">
+      <div className={`w-full `}>
         <EditorContent editor={editor} />
       </div>
     </div>

@@ -4,6 +4,8 @@ import { create } from "zustand";
 const createEmptyQuestion = (type = "multiple", quizId) => ({
   quizId: quizId,
   question_id: Date.now(),
+  title: "",
+  description: "",
   question: "",
   type,
   layout: "col",
@@ -13,6 +15,8 @@ const createEmptyQuestion = (type = "multiple", quizId) => ({
   isNew: true, // 👈 add this (important)
   showLabel: true, // ✅ default ON
   dirtyFields: {
+    title: true,
+    description: true,
     question_id: true,
     question: true,
     type: true,
@@ -48,49 +52,72 @@ export const useQuizStore = create((set) => ({
   setDetails: (details) => set({ details }),
   moveQuestionUp: (id) =>
     set((state) => {
-      const index = state.questions.findIndex((q) => q.question_id === id);
+      const sortedQuestions = [...state.questions].sort(
+        (a, b) => (a.order ?? 0) - (b.order ?? 0),
+      );
+
+      const index = sortedQuestions.findIndex((q) => q.question_id === id);
+
       if (index <= 0) return state;
 
-      const newQuestions = [...state.questions];
-      [newQuestions[index - 1], newQuestions[index]] = [
-        newQuestions[index],
-        newQuestions[index - 1],
+      [sortedQuestions[index - 1], sortedQuestions[index]] = [
+        sortedQuestions[index],
+        sortedQuestions[index - 1],
       ];
 
       return {
-        questions: newQuestions.map((q, i) => ({
+        questions: sortedQuestions.map((q, i) => ({
           ...q,
           order: i,
           isDirty: true,
           dirtyFields: {
             ...(q.dirtyFields || {}),
-            order: true, // ✅ correct
+            order: true,
           },
         })),
       };
     }),
-
   moveQuestionDown: (id) =>
     set((state) => {
-      const index = state.questions.findIndex((q) => q.question_id === id);
-      if (index === -1 || index === state.questions.length - 1) return state;
+      const questions = [...state.questions].sort(
+        (a, b) => (a.order ?? 0) - (b.order ?? 0),
+      );
 
-      const newQuestions = [...state.questions];
-      [newQuestions[index], newQuestions[index + 1]] = [
-        newQuestions[index + 1],
-        newQuestions[index],
-      ];
+      const index = questions.findIndex((q) => q.question_id === id);
+
+      if (index === -1 || index === questions.length - 1) {
+        return state;
+      }
+
+      const current = questions[index];
+      const next = questions[index + 1];
+
+      const currentOrder = current.order;
+      current.order = next.order;
+      next.order = currentOrder;
 
       return {
-        questions: newQuestions.map((q, i) => ({
-          ...q,
-          order: i,
-          isDirty: true,
-          dirtyFields: {
-            ...(q.dirtyFields || {}),
-            order: true, // ✅ correct
-          },
-        })),
+        questions: state.questions.map((q) => {
+          if (
+            q.question_id !== current.question_id &&
+            q.question_id !== next.question_id
+          ) {
+            return q;
+          }
+
+          return {
+            ...q,
+            order:
+              q.question_id === current.question_id
+                ? current.order
+                : next.order,
+            isDirty: true,
+            dirtyFields: {
+              ...(q.dirtyFields || {}),
+              order: true,
+            },
+          };
+        }),
       };
     }),
 
@@ -150,6 +177,40 @@ export const useQuizStore = create((set) => ({
       },
     })),
 
+  updateDescription: (id, value) =>
+    set((state) => ({
+      questions: state.questions.map((q) => {
+        if (q.question_id !== id) return q;
+
+        return {
+          ...q,
+          description: value,
+          isDirty: true,
+          dirtyFields: {
+            ...(q.dirtyFields || {}),
+            // showLabel: true, // ✅ this is the original code without comparing
+            description: (q.dirtyFields?.description || 0) + 1, //updated code to compare revision
+          },
+        };
+      }),
+    })),
+  updateTitle: (id, value) =>
+    set((state) => ({
+      questions: state.questions.map((q) => {
+        if (q.question_id !== id) return q;
+
+        return {
+          ...q,
+          title: value,
+          isDirty: true,
+          dirtyFields: {
+            ...(q.dirtyFields || {}),
+            // showLabel: true, // ✅ this is the original code without comparing
+            title: (q.dirtyFields?.title || 0) + 1, //updated code to compare revision
+          },
+        };
+      }),
+    })),
   updateQuestion: (id, updatedQuestion) =>
     set((state) => ({
       questions: state.questions.map((q) =>
@@ -292,7 +353,7 @@ export const useQuizStore = create((set) => ({
         type,
         order: 0,
       };
-
+      console.log(newQuestion);
       let newOptions = [];
       if (type === "multiple") {
         newOptions = [createOption(newQuestion.question_id, 0)];

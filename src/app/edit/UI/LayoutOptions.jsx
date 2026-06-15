@@ -8,7 +8,7 @@ const LayoutOptions = ({ id, layoutData }) => {
   if (!layoutData) return null;
 
   return (
-    <div className="flex gap-2 text-sm">
+    <div className="flex gap-2 text-sm text-gray-700">
       <span>Options layout:</span>
 
       {["col", "row", "grid"].map((layout) => (
