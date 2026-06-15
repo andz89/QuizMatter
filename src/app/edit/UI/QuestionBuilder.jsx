@@ -20,7 +20,10 @@ import EditQuizDetails from "./EditQuizDetails";
 import Presentation from "@/src/components/presentation/Presentation";
 import FloatingToolbar from "./editor/FloatingToolbar";
 import normalizeSingleQuiz from "@/src/app/utils/lib/normalizeSingleQuiz";
-
+import OptionsReference from "./OptionsReference";
+const getOptionLabel = (index) => {
+  return String.fromCharCode(65 + index); // 65 = "A"
+};
 export default function QuestionBuilder({ quiz }) {
   console.log("QuestionBuilder render");
   const questions = useQuizStore((s) => s.questions);
@@ -159,7 +162,7 @@ export default function QuestionBuilder({ quiz }) {
     );
   }, [questions]);
   return (
-    <div className="bg-white min-h-screen mb-40">
+    <div className="  min-h-screen ">
       {/* quiz header */}
       <PublishSettingsModal
         isOpen={openPublishModal}
@@ -249,8 +252,8 @@ export default function QuestionBuilder({ quiz }) {
               >
                 <div
                   className={`
-                         flex   w-full justify-center my-4   rounded-lg
-                          transition-all duration-300 ease-out
+                        bg-white flex   w-full justify-center my-4   rounded-lg
+                          transition-all duration-300 ease-out shadow-sm
                           ${
                             activeQuestion === q.question_id
                               ? "border-l-3  border-orange-500  "
@@ -274,20 +277,17 @@ export default function QuestionBuilder({ quiz }) {
                         setActiveEditor={setActiveEditor}
                       />
                     )}
-                    {/* {q.type === "para" && (
-                      <QuestionInput
-                        id={q.question_id}
-                        setActiveEditor={setActiveEditor}
-                      />
-                    )} */}
+
                     {/* Layout */}
                     {q.type === "multiple" && (
-                      <div className=" flex justify-between">
-                        <LayoutOptions
-                          id={q.question_id}
-                          layoutData={q.layout}
-                        />
-                      </div>
+                      <OptionsReference
+                        updateQuestionLabelVisibility={
+                          updateQuestionLabelVisibility
+                        }
+                        id={q.question_id}
+                        layoutData={q.layout}
+                        q={q}
+                      />
                     )}
 
                     {/* Fill in the blank */}
@@ -336,6 +336,28 @@ export default function QuestionBuilder({ quiz }) {
                                       correctAnswer={q.correct}
                                     />
                                   ))}
+                                  <div className="flex flex-row items-center   ">
+                                    {q.showLabel && (
+                                      <span className="font-bold  ">
+                                        {getOptionLabel(questionOptions.length)}
+                                        .
+                                      </span>
+                                    )}
+                                    <label className="flex items-start  mt-[-4px] ">
+                                      <input
+                                        type="radio"
+                                        className="accent-orange-600  px-0 w-4 h-4 mx-2"
+                                      />
+                                    </label>{" "}
+                                    <input
+                                      placeholder="Add Option"
+                                      onFocus={(e) => {
+                                        (addOption(q.question_id),
+                                          e.target.blur());
+                                      }}
+                                      className="bg-gray-50 border-b   border-gray-300 p-2   w-full"
+                                    />
+                                  </div>
                                 </DragOptions>
                               </>
                             );
@@ -344,54 +366,7 @@ export default function QuestionBuilder({ quiz }) {
                         {/* Footer */}
                       </div>
                     )}
-
-                    {q.type === "multiple" && (
-                      <div className="flex items-center justify-start gap-2 w-full">
-                        <div className="flex items-center justify-between gap-2 w-[70px]">
-                          <label className="text-sm font-medium text-gray-700">
-                            Label
-                          </label>
-
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={q.showLabel ?? true}
-                              onChange={(e) =>
-                                updateQuestionLabelVisibility(
-                                  q.question_id,
-                                  e.target.checked,
-                                )
-                              }
-                              className="sr-only peer"
-                            />
-
-                            <div
-                              className="w-[30px] h-[14px] bg-gray-300 rounded-full relative
-                            transition-colors duration-300
-                            peer-checked:bg-orange-500
-                            after:content-[''] after:absolute after:top-[1px] after:left-[1px]
-                            after:bg-white after:border after:border-gray-300
-                            after:rounded-full after:h-3 after:w-3
-                            after:transition-all after:duration-300
-
-                            peer-checked:after:translate-x-[16px]
-                            peer-checked:after:border-orange-500
-                            peer-checked:shadow-sm
-"
-                            >
-                              {" "}
-                            </div>
-                          </label>
-                        </div>
-
-                        <button
-                          onClick={() => addOption(q.question_id)}
-                          className="ml-2 px-2 py-1 text-sm text-gray-600 bg-gray-200 rounded hover:bg-gray-300 transition w-32"
-                        >
-                          + Add Option
-                        </button>
-                      </div>
-                    )}
+                    {/* //options reference */}
                   </div>
                   <div
                     className={`

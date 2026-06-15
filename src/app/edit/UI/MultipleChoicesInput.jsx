@@ -18,7 +18,6 @@ const MultipleChoicesInput = ({
   setActiveEditor,
   correctAnswer,
 }) => {
-  console.log("RENDER options", opt.option_id);
   const [deleteOptionId, setDeleteOptionId] = useState(null);
   const updateOption = useQuizStore((state) => state.updateOption);
   const updateQuestion = useQuizStore((state) => state.updateQuestion);
@@ -59,15 +58,15 @@ const MultipleChoicesInput = ({
                 type="radio"
                 checked={correctAnswer === opt.option_id}
                 onChange={handleCorrectChange}
-                className="mx-2 px-0"
+                className="accent-orange-600  px-0 w-4 h-4 mx-2"
               />
             </label>
             {/* Drag handle */}
             {/* Editable */}
-            <div className="bg-gray-50 border border-gray-300  rounded  w-full min-w-0 py-1 pl-1 pr-3">
+            <div className="bg-gray-50 border-b   border-gray-300 p-2   w-full">
               <TinyInputEditor
                 optionDetails={opt}
-                value={opt.label || "option here"}
+                value={opt.label}
                 onChange={handleOptionChange}
                 onFocus={handleFocus}
                 setActiveEditor={setActiveEditor}
@@ -79,9 +78,9 @@ const MultipleChoicesInput = ({
             <span
               {...attributes}
               {...listeners}
-              className="relative cursor-grab mt-[8px] ml-[-12px]"
+              className="relative cursor-grab  ml-[-12px]"
             >
-              <BiGridVertical size={18} className="text-gray-600 mr-1" />
+              <BiGridVertical size={20} className="text-gray-500 mr-1" />
             </span>
             <div className="relative">
               {deleteOptionId === opt.option_id && (

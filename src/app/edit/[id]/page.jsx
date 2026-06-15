@@ -9,7 +9,7 @@ export default async function Page({ params }) {
   const quiz = await getQuizById(id);
 
   return (
-    <div>
+    <div className={"bg-orange-50 pb-10"}>
       <QuestionBuilder quiz={quiz} />
     </div>
   );

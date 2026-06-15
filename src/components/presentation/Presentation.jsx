@@ -59,7 +59,7 @@ const Presentation = ({ quiz, open, onClose }) => {
     quiz?.questions.slice().sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
   );
   return (
-    <div className="fixed inset-0 z-52 flex flex-col justify-center   bg-white">
+    <div className="bg-orange-50 fixed inset-0 z-52 flex flex-col justify-center    ">
       <div
         className="
           w-full  
@@ -118,21 +118,6 @@ const Presentation = ({ quiz, open, onClose }) => {
                 </span>
               </div>
             </div>
-
-            {/* <button
-              onClick={onClose}
-              className="
-                shrink-0
-                p-2 rounded-xl
-                text-slate-500
-                hover:bg-red-100
-                hover:text-red-500
-                transition
-                cursor-pointer
-              "
-            >
-              <HiOutlineXMark size={22} />
-            </button> */}
           </div>
         </div>
 
@@ -154,8 +139,9 @@ const Presentation = ({ quiz, open, onClose }) => {
 
               <div
                 className="
+          
                 p-4 rounded-2xl
-                bg-slate-50
+                bg-white
                 border border-slate-200
 
                 text-slate-700
@@ -178,8 +164,7 @@ const Presentation = ({ quiz, open, onClose }) => {
               return (
                 <div
                   key={index}
-                  className="text-slate-800 mb-5 leading-tight border border-gray-400 p-2 rounded-lg   border border-slate-200
-        bg-slate-50  "
+                  className="text-slate-800 mb-5 leading-tight border border-gray-400 p-2 rounded-lg   border border-slate-200 bg-white   shadow-sm"
                 >
                   {question.questionNumber && (
                     <button
@@ -279,11 +264,11 @@ const Presentation = ({ quiz, open, onClose }) => {
                       .map((option, optionIndex) => (
                         <div
                           key={option.option_id}
-                          className={`flex px-4 py-2 text-slate-700 border border-slate-300 rounded-lg ${
+                          className={`flex px-4 py-2 text-slate-700  ${
                             isAnswerVisible &&
                             question.correct === option.option_id
                               ? "bg-green-200"
-                              : "bg-white"
+                              : " "
                           }`}
                           style={{
                             fontSize: `clamp(${1 * fontSize}rem, ${

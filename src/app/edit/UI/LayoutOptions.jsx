@@ -12,8 +12,9 @@ const LayoutOptions = ({ id, layoutData }) => {
       <span>Options layout:</span>
 
       {["col", "row", "grid"].map((layout) => (
-        <label key={layout} className="flex gap-1">
+        <label key={layout} className="flex gap-1 ">
           <input
+            className="accent-slate-600 w-4"
             type="radio"
             checked={layoutData === layout}
             onChange={() => updateQuestion(id, { layout })}

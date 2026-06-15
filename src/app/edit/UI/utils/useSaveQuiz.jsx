@@ -117,7 +117,6 @@ export function useSaveQuiz() {
         })),
 
         deletedQuestions: deletedQuestionsSnapshot,
-        deletedQuestions: deletedQuestionsSnapshot,
       });
     } catch (err) {
       setError({
