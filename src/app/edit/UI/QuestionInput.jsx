@@ -35,6 +35,7 @@ const QuestionInput = ({ id, index, setActiveEditor }) => {
   return (
     <div className="bg-gray-50 border-b   border-gray-300 p-2   w-full  ">
       <TinyInputEditor
+        isQuestionNew={question.isNew}
         value={localValue}
         onChange={setLocalValue}
         setActiveEditor={setActiveEditor}

@@ -65,7 +65,7 @@ const MultipleChoicesInput = ({
             {/* Editable */}
             <div className="bg-gray-50 border-b   border-gray-300 p-2   w-full">
               <TinyInputEditor
-                optionDetails={opt}
+                isOptionNew={opt.isNew}
                 value={opt.label}
                 onChange={handleOptionChange}
                 onFocus={handleFocus}

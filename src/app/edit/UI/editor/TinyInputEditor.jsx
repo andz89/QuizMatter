@@ -19,6 +19,8 @@ function TinyQuestionEditor({
   inputFrom,
   onFocus,
   onBlur,
+  isOptionNew,
+  isQuestionNew,
 }) {
   const editor = useEditor({
     extensions: [
@@ -70,8 +72,15 @@ function TinyQuestionEditor({
     }
   }, [value, editor]);
 
-  if (!editor) return null;
+  useEffect(() => {
+    if (!editor) return;
 
+    if (isQuestionNew) return;
+
+    if (isOptionNew) {
+      editor.commands.focus("end");
+    }
+  }, [editor, isQuestionNew, isOptionNew]);
   return (
     <div className="flex items-start  ">
       {inputFrom === "question" && (

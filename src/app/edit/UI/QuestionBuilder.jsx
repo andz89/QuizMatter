@@ -115,14 +115,42 @@ export default function QuestionBuilder({ quiz }) {
       document.removeEventListener("hover", handleHoverQuestion);
     };
   }, []);
-  useEffect(() => {
-    // normalize and set quiz details in store when quiz prop changes
-    if (!quiz || quiz.length === 0) return;
+  // useEffect(() => {
+  //   // normalize and set quiz details in store when quiz prop changes
+  //   if (!quiz || quiz.length === 0) return;
 
-    const currentQuiz = quiz;
+  //   const currentQuiz = quiz;
+  //   setDetails({
+  //     quizId: currentQuiz.id,
+  //   });
+  //   if (currentQuiz.questions.length > 0) {
+  //     const { questions, options } = normalizeSingleQuiz(currentQuiz);
+
+  //     useQuizStore.setState({
+  //       questions,
+  //       options,
+  //     });
+  //   }
+  // }, [quiz]);
+  useEffect(() => {
+    if (!quiz) return;
+
+    const currentQuiz = {
+      ...quiz,
+      questions: [...(quiz.questions || [])]
+        .sort((a, b) => a.order - b.order)
+        .map((question) => ({
+          ...question,
+          options: [...(question.options || [])].sort(
+            (a, b) => a.order - b.order,
+          ),
+        })),
+    };
+
     setDetails({
       quizId: currentQuiz.id,
     });
+
     if (currentQuiz.questions.length > 0) {
       const { questions, options } = normalizeSingleQuiz(currentQuiz);
 
@@ -132,7 +160,6 @@ export default function QuestionBuilder({ quiz }) {
       });
     }
   }, [quiz]);
-
   // publish handler, for now it just logs the settings, you can replace it with your API call to publish the quiz
   const handlePublish = (settings) => {
     console.log("Publishing with settings:", settings);
@@ -338,15 +365,16 @@ export default function QuestionBuilder({ quiz }) {
                                   ))}
                                   <div className="flex flex-row items-center   ">
                                     {q.showLabel && (
-                                      <span className="font-bold  ">
+                                      <span className="font-bold  text-gray-400">
                                         {getOptionLabel(questionOptions.length)}
                                         .
                                       </span>
                                     )}
                                     <label className="flex items-start  mt-[-4px] ">
                                       <input
+                                        disabled
                                         type="radio"
-                                        className="accent-orange-600  px-0 w-4 h-4 mx-2"
+                                        className="  px-0 w-4 h-4 mx-2"
                                       />
                                     </label>{" "}
                                     <input

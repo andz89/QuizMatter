@@ -142,6 +142,7 @@ export async function getQuizById(id) {
       )
     `,
     )
+    .order("order", { referencedTable: "questions" })
     .eq("id", id)
     .single();
 

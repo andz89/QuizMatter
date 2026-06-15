@@ -46,7 +46,7 @@ const QuizTypeOptions = ({
       hover:shadow-md
       hover:scale-105
       hover:bg-slate-50
-  opacity-30
+  opacity-65
   group-hover:opacity-100
 
   transition-all duration-200

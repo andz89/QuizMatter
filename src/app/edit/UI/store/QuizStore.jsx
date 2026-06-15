@@ -50,23 +50,91 @@ export const useQuizStore = create((set) => ({
   details: {},
 
   setDetails: (details) => set({ details }),
+  // moveQuestionUp: (id) =>
+  //   set((state) => {
+  //     const sortedQuestions = [...state.questions].sort(
+  //       (a, b) => (a.order ?? 0) - (b.order ?? 0),
+  //     );
+
+  //     const index = sortedQuestions.findIndex((q) => q.question_id === id);
+
+  //     if (index <= 0) return state;
+
+  //     [sortedQuestions[index - 1], sortedQuestions[index]] = [
+  //       sortedQuestions[index],
+  //       sortedQuestions[index - 1],
+  //     ];
+
+  //     return {
+  //       questions: sortedQuestions.map((q, i) => ({
+  //         ...q,
+  //         order: i,
+  //         isDirty: true,
+  //         dirtyFields: {
+  //           ...(q.dirtyFields || {}),
+  //           order: true,
+  //         },
+  //       })),
+  //     };
+  //   }),
+  // moveQuestionDown: (id) =>
+  //   set((state) => {
+  //     const questions = [...state.questions].sort(
+  //       (a, b) => (a.order ?? 0) - (b.order ?? 0),
+  //     );
+
+  //     const index = questions.findIndex((q) => q.question_id === id);
+
+  //     if (index === -1 || index === questions.length - 1) {
+  //       return state;
+  //     }
+
+  //     const current = questions[index];
+  //     const next = questions[index + 1];
+
+  //     const currentOrder = current.order;
+  //     current.order = next.order;
+  //     next.order = currentOrder;
+
+  //     return {
+  //       questions: state.questions.map((q) => {
+  //         if (
+  //           q.question_id !== current.question_id &&
+  //           q.question_id !== next.question_id
+  //         ) {
+  //           return q;
+  //         }
+
+  //         return {
+  //           ...q,
+  //           order:
+  //             q.question_id === current.question_id
+  //               ? current.order
+  //               : next.order,
+  //           isDirty: true,
+  //           dirtyFields: {
+  //             ...(q.dirtyFields || {}),
+  //             order: true,
+  //           },
+  //         };
+  //       }),
+  //     };
+  //   }),
   moveQuestionUp: (id) =>
     set((state) => {
-      const sortedQuestions = [...state.questions].sort(
-        (a, b) => (a.order ?? 0) - (b.order ?? 0),
-      );
+      const questions = [...state.questions];
 
-      const index = sortedQuestions.findIndex((q) => q.question_id === id);
+      const index = questions.findIndex((q) => q.question_id === id);
 
       if (index <= 0) return state;
 
-      [sortedQuestions[index - 1], sortedQuestions[index]] = [
-        sortedQuestions[index],
-        sortedQuestions[index - 1],
+      [questions[index - 1], questions[index]] = [
+        questions[index],
+        questions[index - 1],
       ];
 
       return {
-        questions: sortedQuestions.map((q, i) => ({
+        questions: questions.map((q, i) => ({
           ...q,
           order: i,
           isDirty: true,
@@ -79,9 +147,7 @@ export const useQuizStore = create((set) => ({
     }),
   moveQuestionDown: (id) =>
     set((state) => {
-      const questions = [...state.questions].sort(
-        (a, b) => (a.order ?? 0) - (b.order ?? 0),
-      );
+      const questions = [...state.questions];
 
       const index = questions.findIndex((q) => q.question_id === id);
 
@@ -89,38 +155,23 @@ export const useQuizStore = create((set) => ({
         return state;
       }
 
-      const current = questions[index];
-      const next = questions[index + 1];
-
-      const currentOrder = current.order;
-      current.order = next.order;
-      next.order = currentOrder;
+      [questions[index], questions[index + 1]] = [
+        questions[index + 1],
+        questions[index],
+      ];
 
       return {
-        questions: state.questions.map((q) => {
-          if (
-            q.question_id !== current.question_id &&
-            q.question_id !== next.question_id
-          ) {
-            return q;
-          }
-
-          return {
-            ...q,
-            order:
-              q.question_id === current.question_id
-                ? current.order
-                : next.order,
-            isDirty: true,
-            dirtyFields: {
-              ...(q.dirtyFields || {}),
-              order: true,
-            },
-          };
-        }),
+        questions: questions.map((q, i) => ({
+          ...q,
+          order: i,
+          isDirty: true,
+          dirtyFields: {
+            ...(q.dirtyFields || {}),
+            order: true,
+          },
+        })),
       };
     }),
-
   updateQuestionLabelVisibility: (question_id, value) =>
     set((state) => ({
       questions: state.questions.map((q) => {
