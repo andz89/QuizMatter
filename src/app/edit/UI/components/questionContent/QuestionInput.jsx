@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useQuizStore } from "./store/QuizStore";
-import TinyInputEditor from "./editor/TinyInputEditor";
+import { useQuizStore } from "../../store/QuizStore";
+import TinyInputEditor from "../../editor/TinyInputEditor";
 
 const QuestionInput = ({ id, index, setActiveEditor }) => {
   const question = useQuizStore((state) =>
     state.questions.find((q) => q.question_id === id),
   );
-  console.log("Question input", id);
 
   const updateQuestion = useQuizStore((state) => state.updateQuestion);
 

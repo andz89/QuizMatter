@@ -1,13 +1,31 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { HiMiniPencilSquare, HiChevronDown } from "react-icons/hi2";
+import EditQuizDetails from "./quizDetails/EditQuizDetails";
+import { useQuizStore } from "../store/QuizStore";
 
-const QuizDetails = ({ quiz, setOpenEdit }) => {
+const QuizDetails = () => {
+  const details = useQuizStore((s) => s.details);
+
+  const [quizDetails, setQuizDetails] = useState(null);
+  // quiz details state, it will store the quiz details like title, description etc, it will be passed to quiz details component and edit quiz details component
+  useEffect(() => {
+    setQuizDetails(details);
+  }, [details]);
+
   const [showObjectives, setShowObjectives] = useState(false);
+
+  const [openEdit, setOpenEdit] = useState(false); // edit quiz details modal state, when click on quiz details it will open the modal to edit quiz details like title, description etc
 
   return (
     <div>
+      <EditQuizDetails
+        details={quizDetails}
+        open={openEdit}
+        onClose={() => setOpenEdit(false)}
+        setQuizDetails={setQuizDetails}
+      />
       <div
         className="
           w-full max-w-3xl
@@ -39,7 +57,7 @@ const QuizDetails = ({ quiz, setOpenEdit }) => {
                     break-words
                   "
                 >
-                  {quiz?.title || "Untitled"}
+                  {quizDetails?.title || "Untitled"}
                 </h2>
 
                 <button
@@ -71,7 +89,7 @@ const QuizDetails = ({ quiz, setOpenEdit }) => {
                     border border-orange-200
                   "
                 >
-                  {quiz?.subject}
+                  {quizDetails?.subject}
                 </span>
 
                 <span
@@ -80,7 +98,7 @@ const QuizDetails = ({ quiz, setOpenEdit }) => {
                     text-slate-500 uppercase
                   "
                 >
-                  {quiz?.grade} / {quiz?.quarter} Quarter
+                  {quizDetails?.grade} / {quizDetails?.quarter} Quarter
                 </span>
               </div>
             </div>
@@ -135,7 +153,7 @@ const QuizDetails = ({ quiz, setOpenEdit }) => {
                   whitespace-pre-line
                 "
               >
-                {quiz?.objectives || "No competency added"}
+                {quizDetails?.objectives || "No competency added"}
               </div>
             )}
           </div>

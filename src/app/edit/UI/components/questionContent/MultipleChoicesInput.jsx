@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, use, useState, useCallback } from "react";
-import { useQuizStore } from "./store/QuizStore";
+import { useQuizStore } from "../../store/QuizStore";
 import { BsX } from "react-icons/bs";
 import { BiGridVertical } from "react-icons/bi";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import TinyInputEditor from "./editor/TinyInputEditor";
+import TinyInputEditor from "../../editor/TinyInputEditor";
 import { HiTrash } from "react-icons/hi2";
 import SortableOption from "./SortableOption";
 const getOptionLabel = (index) => {

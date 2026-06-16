@@ -1,15 +1,16 @@
 import React from "react";
 
-import { useQuizStore } from "./store/QuizStore";
-import TinyInputEditor from "./editor/TinyInputEditor";
+import { useQuizStore } from "../../store/QuizStore";
+import TinyInputEditor from "../../editor/TinyInputEditor";
 
-const FillTheBlankInput = ({ question_id, setActiveEditor }) => {
+const FillTheBlankInput = ({ q, setActiveEditor }) => {
+  if (q.type !== "short") return null;
   const question = useQuizStore((state) =>
-    state.questions.find((q) => q.question_id === question_id),
+    state.questions.find((q) => q.question_id === q.question_id),
   );
   const updateQuestion = useQuizStore((state) => state.updateQuestion);
   const handleOptionChange = (value) => {
-    updateQuestion(question_id, {
+    updateQuestion(q.question_id, {
       correct: value,
     });
   };

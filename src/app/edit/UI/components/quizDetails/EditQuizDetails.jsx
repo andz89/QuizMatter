@@ -2,7 +2,7 @@
 
 import React, { useTransition } from "react";
 
-import { createQuizDetails, updateQuizDetails } from "@/src/data-access/quiz";
+import { updateQuizDetails } from "@/src/data-access/quiz";
 const EditQuizDetails = ({ details = {}, open, onClose, setQuizDetails }) => {
   if (!open) return null;
   const [isPending, startTransition] = useTransition();
@@ -77,7 +77,9 @@ const EditQuizDetails = ({ details = {}, open, onClose, setQuizDetails }) => {
           </div>
 
           {/* Hidden ID for update */}
-          {details?.id && <input type="hidden" name="id" value={details.id} />}
+          {details?.quizId && (
+            <input type="hidden" name="id" value={details.quizId} />
+          )}
           {/* Title */}
           <div className="flex flex-col my-2">
             <label className="text-sm text-slate-600 mb-1">Quiz Title</label>

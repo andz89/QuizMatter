@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useQuizStore } from "./store/QuizStore";
+import { useQuizStore } from "../../store/QuizStore";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 
 import {

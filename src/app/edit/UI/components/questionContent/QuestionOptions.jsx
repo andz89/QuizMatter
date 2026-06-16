@@ -1,4 +1,4 @@
-import { useQuizStore } from "./store/QuizStore";
+import { useQuizStore } from "../../store/QuizStore";
 
 import QuizTypeOptions from "./QuizTypeOptions";
 import {
@@ -9,7 +9,7 @@ import {
   BiChevronUp,
 } from "react-icons/bi";
 
-const QuestionHeader = ({ questionLength, questionId }) => {
+const QuestionOptions = ({ questionLength, questionId }) => {
   const { removeQuestion, duplicateQuestion } = useQuizStore();
   const moveUp = useQuizStore((state) => state.moveQuestionUp);
   const moveDown = useQuizStore((state) => state.moveQuestionDown);
@@ -61,4 +61,4 @@ const QuestionHeader = ({ questionLength, questionId }) => {
   );
 };
 
-export default QuestionHeader;
+export default QuestionOptions;

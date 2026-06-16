@@ -25,7 +25,16 @@ export function buildQuizPayload({
 
   const questionPayload = dirtyQuestions.map((q) => {
     const fields = q.isNew
-      ? ["question", "type", "layout", "correct", "showLabel", "order"]
+      ? [
+          "question",
+          "type",
+          "layout",
+          "correct",
+          "showLabel",
+          "order",
+          "title",
+          "description",
+        ]
       : Object.keys(q.dirtyFields || {});
     const updatedFields = fields.reduce((acc, key) => {
       acc[key] = q[key];

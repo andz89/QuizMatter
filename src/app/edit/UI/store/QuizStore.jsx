@@ -245,7 +245,7 @@ export const useQuizStore = create((set) => ({
         };
       }),
     })),
-  updateTitle: (id, value) =>
+  updateTitle: (id, value) => {
     set((state) => ({
       questions: state.questions.map((q) => {
         if (q.question_id !== id) return q;
@@ -261,7 +261,8 @@ export const useQuizStore = create((set) => ({
           },
         };
       }),
-    })),
+    }));
+  },
   updateQuestion: (id, updatedQuestion) =>
     set((state) => ({
       questions: state.questions.map((q) =>

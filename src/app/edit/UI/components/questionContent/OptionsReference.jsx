@@ -1,14 +1,12 @@
 import React from "react";
-import { useQuizStore } from "./store/QuizStore";
-const OptionsReference = ({
-  updateQuestionLabelVisibility,
+import { useQuizStore } from "../../store/QuizStore";
+const OptionsReference = ({ q }) => {
+  if (q.type !== "multiple") return null;
 
-  q,
-  id,
-  layoutData,
-}) => {
+  const updateQuestionLabelVisibility = useQuizStore(
+    (s) => s.updateQuestionLabelVisibility,
+  );
   const updateQuestion = useQuizStore((state) => state.updateQuestion);
-
   return (
     <div className="flex justify-between items-center">
       <div className="flex gap-2 text-sm text-gray-700 mx-4">
@@ -19,8 +17,8 @@ const OptionsReference = ({
             <input
               className="accent-slate-600 w-4"
               type="radio"
-              checked={layoutData === layout}
-              onChange={() => updateQuestion(id, { layout })}
+              checked={q.layout === layout}
+              onChange={() => updateQuestion(q.question_id, { layout })}
             />
             {layout}
           </label>

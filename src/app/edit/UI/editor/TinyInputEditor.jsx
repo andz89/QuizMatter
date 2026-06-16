@@ -36,21 +36,18 @@ function TinyQuestionEditor({
         },
       }),
 
-      Underline,
       Highlight,
       Superscript,
       Subscript,
-      Strike,
     ],
 
     content: value,
-
+    immediatelyRender: false,
     editorProps: {
       attributes: {
         class:
           "min-w-10   min-h-[10px] focus:outline-none text-slate-700 leading-relaxed [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_mark]:bg-yellow-200 [&_mark]:px-1 [&_mark]:rounded",
       },
-      placeholder: "Title",
     },
     onFocus: ({ editor }) => {
       setActiveEditor?.(editor);
@@ -75,12 +72,10 @@ function TinyQuestionEditor({
   useEffect(() => {
     if (!editor) return;
 
-    if (isQuestionNew) return;
-
-    if (isOptionNew) {
+    if (isQuestionNew) {
       editor.commands.focus("end");
     }
-  }, [editor, isQuestionNew, isOptionNew]);
+  }, [editor, isQuestionNew]);
   return (
     <div className="flex items-start  ">
       {inputFrom === "question" && (
