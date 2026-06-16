@@ -9,7 +9,8 @@ import QuestionOptions from "./questionContent/QuestionOptions";
 import { useQuizStore } from "../store/QuizStore";
 import QuizTypeOptions from "./questionContent/QuizTypeOptions";
 import MultipleChoicesContent from "./questionContent/MultipleChoicesContent";
-
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 const QuestionContent = ({
   setActiveQuestion,
   activeQuestion,
@@ -20,9 +21,29 @@ const QuestionContent = ({
   activeRef,
 }) => {
   const questions = useQuizStore((s) => s.questions);
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: q.question_id,
+  });
 
+  const style = {
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : undefined,
+    transition,
+  };
   return (
-    <div onClick={() => setActiveQuestion(q.question_id)}>
+    <div
+      onClick={() => setActiveQuestion(q.question_id)}
+      ref={setNodeRef}
+      style={style}
+    >
       <div
         className={`bg-white flex   w-full justify-center my-4   rounded-lg transition-all duration-300 ease-out shadow-sm
     ${
@@ -34,7 +55,10 @@ const QuestionContent = ({
       >
         <div className="flex flex-col gap-4 p-2 border border-gray-200 rounded-lg w-full min-h-[200px]">
           {/* Question */}
-
+          {/* drag handle */}
+          <button {...attributes} {...listeners} className="cursor-grab">
+            ⋮⋮
+          </button>
           {["multiple", "short"].includes(q.type) && (
             <QuestionInput
               id={q.question_id}
