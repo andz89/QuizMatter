@@ -3,7 +3,7 @@ import { create } from "zustand";
 
 const createEmptyQuestion = (type = "multiple", quizId) => ({
   quizId: quizId,
-  question_id: Date.now(),
+  question_id: crypto.randomUUID(),
   title: "",
   description: "",
   question: "",
@@ -12,8 +12,8 @@ const createEmptyQuestion = (type = "multiple", quizId) => ({
   correct: "",
   order: 0,
   isDirty: true,
-  isNew: true, // 👈 add this (important)
-  showLabel: true, // ✅ default ON
+  isNew: true, //
+  showLabel: true,
   dirtyFields: {
     title: true,
     description: true,
@@ -22,12 +22,12 @@ const createEmptyQuestion = (type = "multiple", quizId) => ({
     type: true,
     layout: true,
     correct: true,
-    showLabel: true, // ✅ track this
+    showLabel: true,
     order: true,
   },
 });
 const createOption = (questionId, order) => ({
-  option_id: Date.now() + Math.random(),
+  option_id: crypto.randomUUID(),
   question_id: questionId,
   label: "",
   order: order,
@@ -344,7 +344,7 @@ export const useQuizStore = create((set) => ({
       if (index === -1) return state;
 
       const q = state.questions[index];
-      const newId = Date.now();
+      const newId = crypto.randomUUID();
 
       const newQuestion = {
         ...q,

@@ -1,6 +1,6 @@
 import React from "react";
 import MultipleChoicesInput from "./MultipleChoicesInput";
-import DragOptions from "./DragOptions";
+import DragOptions from "./dndkit/DragOptions";
 import { useQuizStore } from "../../store/QuizStore";
 
 const getOptionLabel = (index) => {
@@ -31,7 +31,8 @@ const MultipleChoicesContent = ({ q, setActiveEditor }) => {
           <>
             <DragOptions
               questionId={q.question_id}
-              questionOptions={questionOptions}
+              lists={questionOptions}
+              type={"option"}
             >
               {questionOptions.map((opt, index) => (
                 <MultipleChoicesInput

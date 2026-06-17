@@ -38,105 +38,107 @@ export default function FloatingToolbar({ editor }) {
         shadow-sm
       "
     >
-      <div className="relative">
+      <div className="mx-auto flex items-center  gap-1">
+        <div className="relative">
+          <button
+            type="button"
+            disabled={disabled}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => setShowEmojiPicker((prev) => !prev)}
+            className={buttonClass(false)}
+          >
+            😀
+          </button>
+
+          {showEmojiPicker && (
+            <div className="absolute top-10 left-0 z-50">
+              <EmojiPicker
+                width={350}
+                height={500}
+                onEmojiClick={(emojiData) => {
+                  editor?.chain().focus().insertContent(emojiData.emoji).run();
+
+                  setShowEmojiPicker(false);
+                }}
+              />
+            </div>
+          )}
+        </div>
+
+        <button
+          disabled={disabled}
+          type="button"
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          className={buttonClass(editor?.isActive("bold"))}
+        >
+          <HiBold size={16} />
+        </button>
+
+        <button
+          disabled={disabled}
+          type="button"
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          className={buttonClass(editor?.isActive("italic"))}
+        >
+          <HiItalic size={16} />
+        </button>
+
+        <button
+          disabled={disabled}
+          type="button"
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          className={buttonClass(editor?.isActive("underline"))}
+        >
+          <HiUnderline size={16} />
+        </button>
+
         <button
           type="button"
           disabled={disabled}
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() => setShowEmojiPicker((prev) => !prev)}
-          className={buttonClass(false)}
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          className={buttonClass(editor?.isActive("bulletList"))}
         >
-          😀
+          <HiListBullet size={16} />
         </button>
 
-        {showEmojiPicker && (
-          <div className="absolute top-10 left-0 z-50">
-            <EmojiPicker
-              width={400}
-              height={500}
-              onEmojiClick={(emojiData) => {
-                editor?.chain().focus().insertContent(emojiData.emoji).run();
+        <div className="w-px h-6 bg-slate-300 mx-1" />
 
-                setShowEmojiPicker(false);
-              }}
-            />
-          </div>
-        )}
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => editor.chain().focus().toggleHighlight().run()}
+          className={buttonClass(editor?.isActive("highlight"))}
+        >
+          H
+        </button>
+
+        <button
+          disabled={disabled}
+          type="button"
+          onClick={() => editor.chain().focus().toggleSuperscript().run()}
+          className={buttonClass(editor?.isActive("superscript"))}
+        >
+          X²
+        </button>
+
+        <button
+          disabled={disabled}
+          type="button"
+          onClick={() => editor.chain().focus().toggleSubscript().run()}
+          className={buttonClass(editor?.isActive("subscript"))}
+        >
+          X₂
+        </button>
+
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => editor.chain().focus().toggleStrike().run()}
+          className={buttonClass(editor?.isActive("strike"))}
+        >
+          <span className="line-through">S</span>
+        </button>
       </div>
-
-      <button
-        disabled={disabled}
-        type="button"
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        className={buttonClass(editor?.isActive("bold"))}
-      >
-        <HiBold size={16} />
-      </button>
-
-      <button
-        disabled={disabled}
-        type="button"
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        className={buttonClass(editor?.isActive("italic"))}
-      >
-        <HiItalic size={16} />
-      </button>
-
-      <button
-        disabled={disabled}
-        type="button"
-        onClick={() => editor.chain().focus().toggleUnderline().run()}
-        className={buttonClass(editor?.isActive("underline"))}
-      >
-        <HiUnderline size={16} />
-      </button>
-
-      <button
-        type="button"
-        disabled={disabled}
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
-        className={buttonClass(editor?.isActive("bulletList"))}
-      >
-        <HiListBullet size={16} />
-      </button>
-
-      <div className="w-px h-6 bg-slate-300 mx-1" />
-
-      <button
-        type="button"
-        disabled={disabled}
-        onClick={() => editor.chain().focus().toggleHighlight().run()}
-        className={buttonClass(editor?.isActive("highlight"))}
-      >
-        H
-      </button>
-
-      <button
-        disabled={disabled}
-        type="button"
-        onClick={() => editor.chain().focus().toggleSuperscript().run()}
-        className={buttonClass(editor?.isActive("superscript"))}
-      >
-        X²
-      </button>
-
-      <button
-        disabled={disabled}
-        type="button"
-        onClick={() => editor.chain().focus().toggleSubscript().run()}
-        className={buttonClass(editor?.isActive("subscript"))}
-      >
-        X₂
-      </button>
-
-      <button
-        type="button"
-        disabled={disabled}
-        onClick={() => editor.chain().focus().toggleStrike().run()}
-        className={buttonClass(editor?.isActive("strike"))}
-      >
-        <span className="line-through">S</span>
-      </button>
     </div>
   );
 }

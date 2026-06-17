@@ -57,72 +57,78 @@ const Header = ({
   //   if (!isDirty) return; // if not dirty, don't set interval
   //   return () => clearInterval(interval);
   // }, []);
-  return (
-    <div className="fixed top-0 py-2 bg-gray-50 z-51 flex items-center justify-between border-b border-gray-200 w-full px-4">
-      {/* quiz header */}
-      <PublishSettingsModal // modal
-        isOpen={openPublishModal}
-        onClose={() => setOpenPublishModal(false)}
-        onPublish={handlePublish}
-      />
-      <Presentation
-        quiz={presentationQuiz}
-        open={mode === "present"}
-        onClose={() => setMode("view")}
-      />
-      <div>
-        <Image
-          src="/quizmatter-logo.png"
-          alt="School Logo"
-          width={120}
-          height={120}
-          className="object-contain"
-        />
-      </div>
 
-      {/* Center */}
-      <div className="absolute left-1/2 -translate-x-1/2">
-        <FloatingToolbar editor={activeEditor} />
-      </div>
-      <div className="  flex items-center gap-3">
-        <button
-          onClick={() => {
-            setMode("present");
-          }}
-          className="
+  return (
+    <div className="mx-auto w-full md:mb-5 mb-10">
+      <div className="fixed top-0 py-2 bg-gray-50 z-51 flex items-center justify-between border-b border-gray-200 w-full px-4">
+        {/* quiz header */}
+        <PublishSettingsModal // modal
+          isOpen={openPublishModal}
+          onClose={() => setOpenPublishModal(false)}
+          onPublish={handlePublish}
+        />
+        <Presentation
+          quiz={presentationQuiz}
+          open={mode === "present"}
+          onClose={() => setMode("view")}
+        />
+        <div>
+          <Image
+            src="/quizmatter-logo.png"
+            alt="School Logo"
+            width={120}
+            height={120}
+            className="object-contain"
+          />
+        </div>
+
+        {/* Center */}
+        <div className="absolute left-1/2 -translate-x-1/2 md:block hidden">
+          <FloatingToolbar editor={activeEditor} />
+        </div>
+        <div className="  flex items-center gap-3">
+          <button
+            onClick={() => {
+              setMode("present");
+            }}
+            className="
           mx-2
           cursor-pointer
         "
-        >
-          <BsArrowsAngleExpand
-            size={22}
-            className="text-2xl text-slate-800 hover:text-orange-500 transition  "
-          />
-        </button>
+          >
+            <BsArrowsAngleExpand
+              size={22}
+              className="text-2xl text-slate-800 hover:text-orange-500 transition  "
+            />
+          </button>
 
-        <button
-          onClick={() => {
-            setManualSave(true);
-            handleSave();
-          }}
-          disabled={sending || !isDirty}
-          className={`px-4 py-2 rounded shadow-sm ${
-            sending
-              ? "bg-gray-400"
-              : !isDirty
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-slate-900 text-white cursor-pointer"
-          }`}
-        >
-          Save
-        </button>
+          <button
+            onClick={() => {
+              setManualSave(true);
+              handleSave();
+            }}
+            disabled={sending || !isDirty}
+            className={`px-4 py-2 rounded shadow-sm ${
+              sending
+                ? "bg-gray-400"
+                : !isDirty
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-slate-900 text-white cursor-pointer"
+            }`}
+          >
+            Save
+          </button>
 
-        <button
-          onClick={() => setOpenPublishModal(true)}
-          className={`cursor-pointer px-4 py-2 rounded shadow-sm bg-orange-500 text-white `}
-        >
-          Share
-        </button>
+          <button
+            onClick={() => setOpenPublishModal(true)}
+            className={`cursor-pointer px-4 py-2 rounded shadow-sm bg-orange-500 text-white `}
+          >
+            Share
+          </button>
+        </div>
+      </div>
+      <div className="fixed top-14 z-50 md:hidden  w-full ">
+        <FloatingToolbar editor={activeEditor} />
       </div>
     </div>
   );

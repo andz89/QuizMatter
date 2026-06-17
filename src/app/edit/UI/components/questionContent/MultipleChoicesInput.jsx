@@ -1,12 +1,11 @@
-import React, { useRef, useEffect, use, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { useQuizStore } from "../../store/QuizStore";
-import { BsX } from "react-icons/bs";
+
 import { BiGridVertical } from "react-icons/bi";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+
 import TinyInputEditor from "../../editor/TinyInputEditor";
 import { HiTrash } from "react-icons/hi2";
-import SortableOption from "./SortableOption";
+import SortableElement from "./dndkit/DragElement";
 const getOptionLabel = (index) => {
   return String.fromCharCode(65 + index); // 65 = "A"
 };
@@ -50,7 +49,7 @@ const MultipleChoicesInput = ({
         <span className="font-bold mt-[6px]">{getOptionLabel(index)}.</span>
       )}
 
-      <SortableOption id={opt.option_id}>
+      <SortableElement id={opt.option_id}>
         {({ attributes, listeners }) => (
           <div className="flex flex-row items-start flex-1">
             <label className="flex items-start mt-[11px] ">
@@ -78,7 +77,7 @@ const MultipleChoicesInput = ({
             <span
               {...attributes}
               {...listeners}
-              className="relative cursor-grab  ml-[-12px]"
+              className="relative cursor-grab  ml-[-12px] hidden md:block"
             >
               <BiGridVertical size={20} className="text-gray-500 mr-1" />
             </span>
@@ -98,7 +97,7 @@ const MultipleChoicesInput = ({
             </div>
           </div>
         )}
-      </SortableOption>
+      </SortableElement>
     </div>
   );
 };

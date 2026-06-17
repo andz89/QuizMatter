@@ -3,29 +3,21 @@ import Header from "./Header";
 import addQuestionNumbers from "@/src/app/utils/lib/addQuestionNumbers";
 import { useState, useEffect, useRef, useMemo } from "react";
 import QuestionContent from "./QuestionContent";
-
 import QuizDetails from "./QuizDetails";
-
 import QuizTypeOptions from "./questionContent/QuizTypeOptions";
 import { useQuizStore } from "../store/QuizStore";
-
+import DragOptions from "./questionContent/dndkit/DragOptions";
 import normalizeSingleQuiz from "@/src/app/utils/lib/normalizeSingleQuiz";
-import { DndContext, closestCenter } from "@dnd-kit/core";
 
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  arrayMove,
-} from "@dnd-kit/sortable";
+import FloatingToolbar from "../editor/FloatingToolbar";
+
 export default function QuestionBuilder({ quiz }) {
   const questions = useQuizStore((s) => s.questions);
   const options = useQuizStore((s) => s.options);
-
   const deletedQuestions = useQuizStore((s) => s.deletedQuestions);
   const deletedOptions = useQuizStore((s) => s.deletedOptions);
-
   const setDetails = useQuizStore((s) => s.setDetails);
-
+  const [activeQuestion, setActiveQuestion] = useState(null);
   const [activeEditor, setActiveEditor] = useState(null); //tiny editor, to activate tiny editor toolbar in input
   // custom hook to save quiz, it returns handleSave function, sending state and error state
 
@@ -47,7 +39,7 @@ export default function QuestionBuilder({ quiz }) {
   const activeRef = useRef(null); // to detect click outside of question menu and close the menu when click outside
 
   useEffect(() => {
-    // click outside to close menu
+    // click outside to close  quiz type menu
     const handleClickOutside = (event) => {
       // existing menu
       if (activeRef.current && !activeRef.current.contains(event.target)) {
@@ -62,41 +54,6 @@ export default function QuestionBuilder({ quiz }) {
     };
   }, []);
 
-  const activeQuestionRef = useRef(null);
-
-  const [activeQuestion, setActiveQuestion] = useState(null);
-  useEffect(() => {
-    // click outside to close menu
-    const handleHoverQuestion = (event) => {
-      // existing menu
-      if (!activeQuestionRef.current) {
-        setActiveQuestion(null);
-      }
-    };
-
-    document.addEventListener("hover", handleHoverQuestion);
-
-    return () => {
-      document.removeEventListener("hover", handleHoverQuestion);
-    };
-  }, []);
-  // useEffect(() => {
-  //   // normalize and set quiz details in store when quiz prop changes
-  //   if (!quiz || quiz.length === 0) return;
-
-  //   const currentQuiz = quiz;
-  //   setDetails({
-  //     quizId: currentQuiz.id,
-  //   });
-  //   if (currentQuiz.questions.length > 0) {
-  //     const { questions, options } = normalizeSingleQuiz(currentQuiz);
-
-  //     useQuizStore.setState({
-  //       questions,
-  //       options,
-  //     });
-  //   }
-  // }, [quiz]);
   useEffect(() => {
     if (!quiz) return;
     // normalize or arrange and set quiz details in store when quiz prop changes
@@ -137,46 +94,6 @@ export default function QuestionBuilder({ quiz }) {
     );
   }, [questions]);
 
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-
-    if (!over || active.id === over.id) return;
-
-    const sortedQuestions = [...questions].sort(
-      (a, b) => (a.order ?? 0) - (b.order ?? 0),
-    );
-
-    const oldIndex = sortedQuestions.findIndex(
-      (q) => String(q.question_id) === String(active.id),
-    );
-
-    const newIndex = sortedQuestions.findIndex(
-      (q) => String(q.question_id) === String(over.id),
-    );
-
-    if (oldIndex === -1 || newIndex === -1) return;
-
-    const movedQuestions = arrayMove(sortedQuestions, oldIndex, newIndex);
-
-    const reordered = movedQuestions.map((q, index) => {
-      const newOrder = index + 1;
-      const orderChanged = q.order !== newOrder;
-
-      return {
-        ...q,
-        order: newOrder,
-        isDirty: q.isDirty || orderChanged,
-        dirtyFields: {
-          ...(q.dirtyFields || {}),
-          ...(orderChanged && { order: true }),
-        },
-      };
-    });
-
-    useQuizStore.setState({
-      questions: reordered,
-    });
-  };
   return (
     <div className="  min-h-screen ">
       {/* header */}
@@ -198,27 +115,20 @@ export default function QuestionBuilder({ quiz }) {
 
           {/* Questions details end */}
 
-          <DndContext
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={itemsWithNumbers.map((q) => q.question_id)}
-              strategy={verticalListSortingStrategy}
-            >
-              {itemsWithNumbers.map((q) => (
-                <QuestionContent
-                  key={q.question_id}
-                  q={q}
-                  setActiveQuestion={setActiveQuestion}
-                  activeQuestion={activeQuestion}
-                  setActiveEditor={setActiveEditor}
-                  setOpenMenu={setOpenMenu}
-                  openMenu={openMenu}
-                />
-              ))}
-            </SortableContext>
-          </DndContext>
+          <DragOptions lists={itemsWithNumbers} type={"question"}>
+            {itemsWithNumbers.map((q) => (
+              <QuestionContent
+                key={q.question_id}
+                q={q}
+                setActiveQuestion={setActiveQuestion}
+                activeQuestion={activeQuestion}
+                setActiveEditor={setActiveEditor}
+                setOpenMenu={setOpenMenu}
+                openMenu={openMenu}
+                activeRef={activeRef}
+              />
+            ))}
+          </DragOptions>
 
           {itemsWithNumbers.length < 1 && (
             <div className="mt-5 w-full relative mx-auto">
@@ -227,7 +137,6 @@ export default function QuestionBuilder({ quiz }) {
                 setOpenMenu={setOpenMenu}
                 isActive={openMenu === "empty"}
                 activeRef={activeRef}
-                openMenu={openMenu}
               />
             </div>
           )}
