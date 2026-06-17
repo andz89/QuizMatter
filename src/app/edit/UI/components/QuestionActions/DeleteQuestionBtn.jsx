@@ -6,7 +6,7 @@ import {
   BiChevronDown,
   BiChevronUp,
 } from "react-icons/bi";
-import { useQuizStore } from "../../../store/QuizStore";
+import { useQuizStore } from "../../store/QuizStore";
 const DeleteQuestionBtn = ({ questionLength, questionId }) => {
   const { removeQuestion } = useQuizStore();
 

@@ -1,4 +1,4 @@
-import { useQuizStore } from "../../store/QuizStore";
+import { useQuizStore } from "../store/QuizStore";
 
 import {
   BiDuplicate,
@@ -7,8 +7,8 @@ import {
   BiChevronDown,
   BiChevronUp,
 } from "react-icons/bi";
-import DuplicateQuestionBtn from "./actions/DuplicateQuestionBtn";
-import DeleteQuestionBtn from "./actions/DeleteQuestionBtn";
+import DuplicateQuestionBtn from "./QuestionActions/DuplicateQuestionBtn";
+import DeleteQuestionBtn from "./QuestionActions/DeleteQuestionBtn";
 export const QuestionOptionsDesktop = ({ questionLength, questionId }) => {
   return (
     <div

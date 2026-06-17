@@ -2,11 +2,11 @@
 import Header from "./Header";
 import addQuestionNumbers from "@/src/app/utils/lib/addQuestionNumbers";
 import { useState, useEffect, useRef, useMemo } from "react";
-import QuestionContent from "./QuestionContent";
+import QuestionContent from "./QuestionCard";
 import QuizDetails from "./QuizDetails";
-import QuizTypeOptions from "./questionContent/QuizTypeOptions";
+import QuizTypeOptions from "./QuestionTypeMenu";
 import { useQuizStore } from "../store/QuizStore";
-import DragOptions from "./questionContent/dndkit/DragOptions";
+import DragOptions from "./dndkit/DragOptions";
 import normalizeSingleQuiz from "@/src/app/utils/lib/normalizeSingleQuiz";
 
 import FloatingToolbar from "../editor/FloatingToolbar";

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useQuizStore } from "../../store/QuizStore";
+import { useQuizStore } from "../store/QuizStore";
 import { HiChevronDown } from "react-icons/hi2";
 import { HiBars3BottomLeft, HiOutlineDocumentText } from "react-icons/hi2";
 import { LuText } from "react-icons/lu";

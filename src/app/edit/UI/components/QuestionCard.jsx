@@ -1,18 +1,18 @@
 import React from "react";
-import QuestionInput from "./questionContent/QuestionInput";
+import QuestionInput from "./QuestionInput";
 
-import FillTheBlankInput from "./questionContent/FillTheBlankInput";
+import FillTheBlankInput from "./AnswerType/FillTheBlankInput";
 
-import Textbox from "./questionContent/TextBox";
-import OptionsReference from "./questionContent/OptionsReference";
+import Textbox from "./TextBox";
+import QuestionSettings from "./QuestionSettings";
 import {
   QuestionOptionsDesktop,
   QuestionOptionsMobile,
-} from "./questionContent/SidePanelActions";
+} from "./SidePanelActions";
 import { useQuizStore } from "../store/QuizStore";
-import QuizTypeOptions from "./questionContent/QuizTypeOptions";
-import MultipleChoicesContent from "./questionContent/MultipleChoicesContent";
-import SortableElement from "./questionContent/dndkit/DragElement";
+import QuizTypeOptions from "./QuestionTypeMenu";
+import MultipleChoicesContent from "./AnswerType/MultipleChoicesContent";
+import SortableElement from "./dndkit/DragElement";
 
 const QuestionContent = ({
   setActiveQuestion,
@@ -72,7 +72,7 @@ const QuestionContent = ({
 
               {/* Layout */}
 
-              <OptionsReference q={q} />
+              <QuestionSettings q={q} />
 
               {/* Fill in the blank */}
 

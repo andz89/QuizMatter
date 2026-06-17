@@ -1,6 +1,6 @@
 import React from "react";
 
-import QuestionBuilder from "@/src/app/edit/UI/components/QuestionBuilder";
+import QuizEditor from "@/src/app/edit/UI/components/QuizEditor";
 
 import { getQuizById } from "../../../data-access/quiz";
 export default async function Page({ params }) {
@@ -10,7 +10,7 @@ export default async function Page({ params }) {
 
   return (
     <div className={"bg-orange-50 pb-10"}>
-      <QuestionBuilder quiz={quiz} />
+      <QuizEditor quiz={quiz} />
     </div>
   );
 }

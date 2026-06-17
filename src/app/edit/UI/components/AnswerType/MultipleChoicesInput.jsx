@@ -5,7 +5,7 @@ import { BiGridVertical } from "react-icons/bi";
 
 import TinyInputEditor from "../../editor/TinyInputEditor";
 import { HiTrash } from "react-icons/hi2";
-import SortableElement from "./dndkit/DragElement";
+import SortableElement from "../dndkit/DragElement";
 const getOptionLabel = (index) => {
   return String.fromCharCode(65 + index); // 65 = "A"
 };

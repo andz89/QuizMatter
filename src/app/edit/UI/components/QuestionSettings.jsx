@@ -1,7 +1,7 @@
 import React from "react";
-import { useQuizStore } from "../../store/QuizStore";
-import LayoutOptions from "./actions/LayoutOptions";
-import ShowLabel from "./actions/ShowLabel";
+import { useQuizStore } from "../store/QuizStore";
+import LayoutOptions from "./QuestionSettings/LayoutOptions";
+import ShowLabel from "./QuestionSettings/ShowLabel";
 const OptionsReference = ({ q }) => {
   if (q.type !== "multiple") return null;
 

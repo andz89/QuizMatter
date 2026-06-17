@@ -1,6 +1,6 @@
 import React from "react";
 import MultipleChoicesInput from "./MultipleChoicesInput";
-import DragOptions from "./dndkit/DragOptions";
+import DragOptions from "../dndkit/DragOptions";
 import { useQuizStore } from "../../store/QuizStore";
 
 const getOptionLabel = (index) => {

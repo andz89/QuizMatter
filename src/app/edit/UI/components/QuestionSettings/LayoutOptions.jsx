@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useQuizStore } from "../../../store/QuizStore";
+import { useQuizStore } from "../../store/QuizStore";
 import { HiChevronDown } from "react-icons/hi";
 
 const layouts = ["col", "row", "grid"];

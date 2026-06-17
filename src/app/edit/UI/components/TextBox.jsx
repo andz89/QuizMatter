@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useQuizStore } from "../../store/QuizStore";
-import TinyInputEditor from "../../editor/TinyInputEditor";
+import { useQuizStore } from "../store/QuizStore";
+import TinyInputEditor from "../editor/TinyInputEditor";
 
 const TextBox = ({ q, setActiveEditor }) => {
   const question = useQuizStore((state) =>

@@ -1,5 +1,5 @@
 import React from "react";
-import { useQuizStore } from "../../../store/QuizStore";
+import { useQuizStore } from "../../store/QuizStore";
 import { BiDuplicate } from "react-icons/bi";
 
 const DuplicateQuestionBtn = ({ questionId }) => {
